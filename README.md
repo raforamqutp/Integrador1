@@ -62,4 +62,4 @@ Este proyecto es desarrollado como parte del curso **Curso Integrador I: Sistema
 
 ## **📞 Contacto**  
 ¿Preguntas o sugerencias? Contactar al líder del proyecto:  
-✉ **Calderon Huamantupa Patrick Anthony** - [U22209191@utp.edu.pe]  
+✉ **Urviola Zapata Manuel Eduardo** - [U22209191@utp.edu.pe]  
