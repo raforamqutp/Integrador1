@@ -30,17 +30,17 @@ Sistema web desarrollado en **Java 21 con Spring Boot** para automatizar la gest
 ---
 
 ## **👥 Equipo de Desarrollo**  
-| **Integrante**               | **Rol Principal**                                  | **Contribución**                                      |
-|------------------------------|----------------------------------------------------|-------------------------------------------------------|
-| Calderon Huamantupa Patrick Anthony | Líder, Frontend, Diseñador            | Coordinación general e interfaz de usuario.           |
-| Choque Copaja Elisban Jhon   | Base de Datos                                      | Modelado y optimización de la base de datos.          |
-| Choque Vicuña Daniel Emmanuel| Backend                                            | Implementación de servicios REST y lógica de negocio. |
-| Ramirez Quiroz Rafael Alejandro | Analista (Requerimientos), Beta Tester           | Documentación y pruebas.                              |
-| Quicaña Taboada Andre Sebastián | Sufrimiento Trasero (QA)                      | Control de calidad y debugging.                       |
-| Urviola Zapata Manuel Eduardo| Documentación, Backend                             | Manuales técnicos y APIs.                             |
-| Jiménez Coila Reyarmano      | Analista (Código), Cronograma                      | Planificación y revisión de código.                   |
-| Martinez Quispe Rodrg Gabriel| Miembro del Backend                                | Desarrollo de módulos clave.                          |
-| Quispesivana Huamani Fidel  | Miembro del Backend                                | Integración de reportes.                              |
+| **Integrante**                      | **Rol Principal**                      | **Contribución**                                    |
+| ----------------------------------- | -------------------------------------- | --------------------------------------------------- |
+| Urviola Zapata Manuel Eduardo       | Líder, Frontend, Diseñador             | Coordinación general, diseño y desarrollo Frontend  |
+| Choque Copaja Elisban Jhon          | Miembro Frontend                       | Desarrollo Frontend, interfaz de usuario            |
+| Calderón Huamantupa Patrick Anthony | Base de Datos                          | Gestión y diseño de la base de datos                |
+| Choque Vicuña Daniel Emmanuel       | Analista (código), Cronograma          | Análisis de código y planificación de cronograma    |
+| Ramírez Quiroz Rafael Alejandro     | Líder Backend                          | Coordinación general Backend, arquitectura          |
+| Quicaña Taboada André Sebastián     | Analista (requerimientos), Beta Tester | Recolección de requerimientos, pruebas              |
+| Jiménez Coila Reyarmano             | Documentación, Beta Tester, Frontend   | Documentación técnica, pruebas, desarrollo Frontend |
+| Martínez Quispe Rodrigo Gabriel     | Miembro Backend                        | Desarrollo Backend y mantenimiento de API           |
+| Quispesivana Huamani Fidel          | Miembro Backend                        | Desarrollo Backend y optimización de procesos       |
 
 
 ---
