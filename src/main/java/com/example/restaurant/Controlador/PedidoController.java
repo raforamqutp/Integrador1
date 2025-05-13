@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pedido")
-@CrossOrigin(origins = "*") // Para permitir conexión desde el frontend
+@CrossOrigin(origins = "*")
 public class PedidoController {
 
     @Autowired
@@ -18,7 +18,8 @@ public class PedidoController {
 
     @PostMapping("/agregar")
     public void agregarItem(@RequestBody ItemDTO dto) {
-        Item item = new Item(dto.getNombre(), dto.getCategoria(), dto.getCantidad());
+        // Convertir categoría a mayúsculas para coincidir con el ENUM de la BD
+        Item item = new Item(dto.getNombre(), dto.getCategoria().toUpperCase(), dto.getCantidad());
         pedidoService.agregarItem(item);
     }
 
@@ -32,3 +33,5 @@ public class PedidoController {
         pedidoService.limpiarPedido();
     }
 }
+
+
