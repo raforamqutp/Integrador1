@@ -1,4 +1,5 @@
 # Documentación Técnica (BACKEND)
+Fecha: 23/05/2025
 
 ## Índice
 1. **Arquitectura del Proyecto**
