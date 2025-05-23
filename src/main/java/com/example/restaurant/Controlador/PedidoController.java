@@ -1,8 +1,11 @@
-package com.example.restaurant.controlador;
+package com.example.restaurant.Controlador;
 
 import com.example.restaurant.dto.ItemDTO;
 import com.example.restaurant.modelo.Item;
 import com.example.restaurant.servicio.PedidoService;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +34,13 @@ public class PedidoController {
     @DeleteMapping("/limpiar")
     public void limpiarPedido() {
         pedidoService.limpiarPedido();
+    }
+    
+    @PostMapping("/confirmar")
+    public void confirmarPedido(HttpSession session) {
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        Integer clienteId = 1; // Obtener de manera dinámica según tu lógica
+        pedidoService.guardarPedidoEnBD(usuarioId, clienteId);
     }
 }
 

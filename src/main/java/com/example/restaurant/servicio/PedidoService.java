@@ -1,8 +1,9 @@
 package com.example.restaurant.servicio;
 
 import com.example.restaurant.entidades.*;
-import com.example.restaurant.repositorios.*;
 import com.example.restaurant.modelo.Item;
+import com.example.restaurant.modelo.PedidoSession;
+import com.example.restaurant.repositorios.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class PedidoService {
 
     @Autowired
     private ClienteRepository clienteRepo;
+    
+    @Autowired
+    private PedidoSession pedidoSession;
 
     // Mock temporal (usuario y cliente por defecto)
     private static final int ID_USUARIO_DEFAULT = 1;
@@ -55,6 +59,7 @@ public class PedidoService {
         pedidoTemporal.add(item);
     }
 
+    /* OLD CODE:
     @Transactional
     public void guardarPedidoEnBD() {
         // Obtener usuario y cliente mock
@@ -65,7 +70,7 @@ public class PedidoService {
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
         pedido.setCliente(cliente);
-        pedido.setTotal(BigDecimal.ZERO);
+        pedido.setTotal(0.0);         // previously `pedido.setTotal(BigDecimal.ZERO);`
         pedidoRepo.save(pedido);
 
         // Guardar detalles
@@ -86,12 +91,59 @@ public class PedidoService {
             }
 
             detallePedidoRepo.save(detalle);
-            pedido.setTotal(pedido.getTotal().add(detalle.getSubtotal()));
+            double newTotal = pedido.getTotal() + detalle.getSubtotal().doubleValue(); // new line added
+            pedido.setTotal(newTotal); // previously `pedido.setTotal(pedido.getTotal().add(detalle.getSubtotal()));`
         }
 
         pedidoRepo.save(pedido);
         pedidoTemporal.clear();
     }
+     * */
+    @Transactional
+    public void guardarPedidoEnBD(int usuarioId, int clienteId) {
+        // Obtener usuario y cliente de la base de datos
+    	Usuario usuario = usuarioRepo.findById(usuarioId).orElseThrow();
+        Cliente cliente = clienteRepo.findById(clienteId).orElseThrow();
+
+        // Crear pedido
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(usuario);
+        pedido.setCliente(cliente);
+        pedido.setTotal(BigDecimal.ZERO.doubleValue());		// Set initial 'total' to BigDecimal.ZERO
+        pedidoRepo.save(pedido);
+        
+        pedido.setTotal(0.0);
+
+        BigDecimal total = BigDecimal.ZERO;
+		// Guardar detalles
+        for (Item item : pedidoSession.getItems()) {
+        	DetallePedido detalle = new DetallePedido();
+            detalle.setPedido(pedido);
+            detalle.setCantidad(item.getCantidad());
+            detalle.setPrecioUnitario(item.getPrecioUnitario());
+            
+            BigDecimal subtotal = item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad()));
+            detalle.setSubtotal(subtotal);
+            total = total.add(subtotal);
+            
+            if (item.getCategoria().equals("COMIDA")) {
+                Comida comida = comidaRepo.findByNombreComida(item.getNombre());
+                detalle.setComida(comida);
+                detalle.setTipoItem(comida.getTipoComida() == TipoComida.entrada ? TipoItem.ENTRADA : TipoItem.COMIDA);
+            } else {
+                Bebida bebida = bebidaRepo.findByNombreBebida(item.getNombre());
+                detalle.setBebida(bebida);
+                detalle.setTipoItem(TipoItem.BEBIDA);
+            }
+            detallePedidoRepo.save(detalle);
+        	
+        }
+        double newTotal = total.doubleValue();  // Convert BigDecimal to double
+        pedido.setTotal(total.doubleValue());       //intended original way ->   pedido.setTotal(total);
+        pedidoRepo.save(pedido);
+        pedidoSession.clear();
+    }
+    
 
     public List<Item> obtenerPedido() {
         return pedidoTemporal;
