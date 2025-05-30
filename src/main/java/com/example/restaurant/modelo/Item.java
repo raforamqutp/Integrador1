@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Item {
     private String nombre;
-    private String categoria; // "COMIDA" o "BEBIDA"
+    private String categoria; // "COMIDA", "BEBIDA" o "ENTRADA"
     private int cantidad;
     private BigDecimal precioUnitario;
 
