@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link rel="stylesheet" href="historialstyle.css">
+<link rel="stylesheet" href="CSS/historialstyle.css">
 </head>
 <body>
 <div class="d-flex position-relative">
@@ -42,12 +42,10 @@
   <!-- Botones laterales -->
   <div class="right-controls">
     <!-- Botón volver -->
-    <div class="volver">
-      <a href="main.html">
-        <div class="boton-volver d-flex justify-content-center align-items-center">
+    <div class="volver" >
+        <div class="boton-volver d-flex justify-content-center align-items-center" onclick="volverSegunRol()">
           ↩
         </div>
-      </a>
     </div>
 
     <!-- Botón siguiente -->
@@ -62,6 +60,16 @@
   </div>
 </div>
 
+<script>
+  function volverSegunRol() {
+	    const rol = localStorage.getItem('rolUsuario');
 
+	    if (rol === 'ADMIN') {
+	      window.location.href = 'admin.html';
+	    } else {
+	      window.location.href = 'main.html';
+	    }
+	  }
+  </script>
 </body>
 </html>

@@ -2,29 +2,35 @@ package com.example.restaurant.Controlador;
 
 import com.example.restaurant.entidades.Usuario;
 import com.example.restaurant.repositorios.UsuarioRepository;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/auth")
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/usuarios")
 public class AuthController {
 
     @Autowired
-    private UsuarioRepository usuarioRepo;
+    private UsuarioRepository usuarioRepository;
+
+    @GetMapping
+    public List<Usuario> obtenerUsuarios() {
+        return usuarioRepository.findAll();
+    }
 
     @PostMapping("/login")
-    public String login(@RequestParam String nombreUsuario, 
-                       @RequestParam String contraseña, 
-                       HttpSession session) {
-        Usuario usuario = usuarioRepo.findByNombreUsuarioAndContraseña(nombreUsuario, contraseña);
-        if (usuario != null) {
-            session.setAttribute("usuarioId", usuario.getIdUsuario());
-            return "redirect:/main.html";
+    public String login(@RequestBody Usuario usuario) {
+        Usuario encontrado = usuarioRepository.findByNombreUsuarioAndContrasena(
+            usuario.getNombreUsuario(), usuario.getContrasena()
+        );
+        if (encontrado != null) {
+            return encontrado.getRol(); 
+        } else {
+            return "ERROR";
         }
-        return "redirect:/login.html?error";
     }
 }

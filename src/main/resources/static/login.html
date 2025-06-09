@@ -4,13 +4,13 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Login - El sabor de Marcona</title>
-	<link rel="stylesheet" href="stylelogin.css">
+	<link rel="stylesheet" href="CSS/stylelogin.css">
 </head>
 
 <body>
 	<div class="container">
 		<div class="logo">
-			<img src="logorestaurant.jpeg" alt="Logo El sabor de Marcona">
+			<img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona">
 			<p>El sabor de <br><strong>Marcona</strong></p>
 		</div>
 
@@ -27,11 +27,42 @@
 	</div>
 	<script>
 		const botonIngresar = document.getElementById('botonIngresar');
-
-		botonIngresar.addEventListener('click', function() {
-			window.location.href = 'main.html';
+	
+		botonIngresar.addEventListener('click', function () {
+			const nombreUsuario = document.getElementById('usuario').value;
+			const contrasena = document.getElementById('contrasena').value;
+	
+			fetch('http://localhost:8081/usuarios/login', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					nombreUsuario: nombreUsuario,
+					contrasena: contrasena
+				})
+			})
+				.then(response => response.text())
+				.then(data => {
+					if (data === 'ADMIN') {
+						localStorage.setItem('rolUsuario', 'ADMIN');
+						window.location.href = 'admin.html';
+					} else if (data === 'USER') {
+						localStorage.setItem('rolUsuario', 'USER');
+						window.location.href = 'main.html';
+					} else {
+						alert('Usuario o contraseña incorrectos');
+					}
+				})
+					
+				.catch(error => {
+					console.error('Error al iniciar sesión:', error);
+					alert('Ingrese una cuenta correcta');
+				});
 		});
-	</script>
+</script>
+
+	
 </body>
 
 </html>
