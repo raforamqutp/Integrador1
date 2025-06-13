@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - Restaurante</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .pension-fields {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .clientes-lista {
+            margin-top: 30px;
+        }
+
+        .cliente-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cliente-info h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .cliente-info p {
+            color: #666;
+            margin: 2px 0;
+        }
+
+        .cliente-actions button {
+            margin-left: 5px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cliente-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cliente-actions {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Gestión de Clientes</h1>
+            <p>Sistema de Administración del Restaurante</p>
+        </div>
+
+        <!-- Registro de Cliente -->
+        <div class="card">
+            <h2>Registrar Nuevo Cliente</h2>
+            <div id="alertContainer"></div>
+            
+            <form id="clienteForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre del Cliente *</label>
+                        <input type="text" id="nombreCliente" name="nombreCliente" required 
+                               placeholder="Ingrese el nombre completo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tipoCliente">Tipo de Cliente *</label>
+                        <select id="tipoCliente" name="tipoCliente" required onchange="togglePensionFields()">
+                            <option value="">Seleccione el tipo...</option>
+                            <option value="PARTICULAR">Particular</option>
+                            <option value="PENSION">Pensionado</option>
+                            <option value="EMPRESA">Empresa</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Información para pensionados -->
+                <div id="pensionFields" class="pension-fields hidden">
+                    <h3>Información de Pensión</h3>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        ℹ️ Los detalles de la pensión se podrán configurar después de crear el cliente.
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <button type="button" class="btn" onclick="registrarCliente()">
+                        Registrar Cliente
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                        Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Clientes -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Lista de Clientes</h2>
+                <div>
+                    <button class="btn btn-secondary" onclick="cargarClientes()">
+                        🔄 Actualizar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group" style="max-width: 400px;">
+                <label for="buscarNombre">Buscar Cliente</label>
+                <input type="text" id="buscarNombre" placeholder="Ingrese nombre a buscar..."
+                       oninput="buscarClientes()">
+            </div>
+            
+            <div id="clientesLista" class="clientes-lista">
+                <div class="loading">Cargando clientes...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let clientesData = [];
+        let timeoutBusqueda = null;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarClientes();
+        });
+
+        // Mostrar/ocultar campos de pensión
+        function togglePensionFields() {
+            const tipoCliente = document.getElementById('tipoCliente').value;
+            const pensionFields = document.getElementById('pensionFields');
+            
+            if (tipoCliente === 'PENSION') {
+                pensionFields.classList.remove('hidden');
+            } else {
+                pensionFields.classList.add('hidden');
+            }
+        }
+
+		// Registrar cliente con JSON
+		async function registrarCliente() {
+		    const form = document.getElementById('clienteForm');
+		    
+		    // Validar formulario
+		    if (!form.checkValidity()) {
+		        form.reportValidity();
+		        return;
+		    }
+
+		    const nombreCliente = document.getElementById('nombreCliente').value.trim();
+		    const tipoCliente = document.getElementById('tipoCliente').value;
+
+		    // Validar longitud del nombre
+		    if (nombreCliente.length < 3 || nombreCliente.length > 100) {
+		        mostrarAlerta('El nombre debe tener entre 3 y 100 caracteres', 'error');
+		        return;
+		    }
+
+		    try {
+		        const clienteData = {
+		            nombreCliente: nombreCliente,
+		            tipoCliente: tipoCliente // Debe ser exactamente igual al enum en Java (ej. "PENSION")
+		        };
+
+		        const response = await fetch('/clientes/guardar', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json',
+		                'Accept': 'application/json'
+		            },
+		            body: JSON.stringify(clienteData)
+		        });
+
+		        if (response.ok) {
+		            mostrarAlerta('Cliente registrado exitosamente!', 'success');
+		            limpiarFormulario();
+		            cargarClientes();
+		        } else {
+		            const errorText = await response.text();
+		            mostrarAlerta('Error al registrar el cliente: ' + errorText, 'error');
+		        }
+		    } catch (error) {
+		        console.error('Error:', error);
+		        mostrarAlerta('Error de conexión al registrar cliente', 'error');
+		    }
+		}
+
+        // Cargar lista de clientes
+        async function cargarClientes() {
+            try {
+                const response = await fetch('/clientes/api/buscar/todos', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar clientes');
+                }
+                
+                clientesData = await response.json();
+                mostrarClientes(clientesData);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error al cargar clientes', 'error');
+                document.getElementById('clientesLista').innerHTML = 
+                    '<p style="text-align: center; color: #666; padding: 20px;">Error al cargar los clientes</p>';
+            }
+        }
+
+        // Mostrar clientes en la lista
+        function mostrarClientes(clientes) {
+            const container = document.getElementById('clientesLista');
+            
+            if (!clientes || clientes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No hay clientes registrados</p>';
+                return;
+            }
+            
+            container.innerHTML = clientes.map(cliente => `
+                <div class="cliente-item">
+                    <div class="cliente-info">
+                        <h4>${cliente.nombreCliente}</h4>
+                        <p><strong>ID:</strong> ${cliente.idCliente}</p>
+                        <p><strong>Tipo:</strong> ${formatearTipoCliente(cliente.tipoCliente)}</p>
+                        ${cliente.pedidos ? `<p><strong>Pedidos:</strong> ${cliente.pedidos.length}</p>` : ''}
+                    </div>
+                    <div class="cliente-actions">
+                        <button class="btn btn-secondary" onclick="editarCliente(${cliente.idCliente})">
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-danger" onclick="eliminarCliente(${cliente.idCliente}, '${cliente.nombreCliente}')">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Buscar clientes por nombre con debounce
+        function buscarClientes() {
+            clearTimeout(timeoutBusqueda);
+            const termino = document.getElementById('buscarNombre').value.trim();
+            
+            if (termino === '') {
+                mostrarClientes(clientesData);
+                return;
+            }
+            
+            // Debounce de 300ms para evitar muchas peticiones
+            timeoutBusqueda = setTimeout(async () => {
+                if (termino.length < 2) {
+                    mostrarAlerta('Ingrese al menos 2 caracteres para buscar', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/clientes/cajero/busqueda-rapida?termino=${encodeURIComponent(termino)}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Error en la búsqueda');
+                    }
+                    
+                    const clientes = await response.json();
+                    mostrarClientes(clientes);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error en la búsqueda', 'error');
+                }
+            }, 300);
+        }
+
+        // Eliminar cliente
+        async function eliminarCliente(id, nombre) {
+            if (!confirm(`¿Está seguro de eliminar al cliente "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                const response = await fetch(`/clientes/eliminar/${id}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.redirected || response.ok) {
+                    mostrarAlerta('Cliente eliminado exitosamente', 'success');
+                    cargarClientes();
+                } else {
+                    mostrarAlerta('Error al eliminar el cliente. Puede tener pedidos asociados.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error de conexión al eliminar cliente', 'error');
+            }
+        }
+
+        // Editar cliente
+        function editarCliente(id) {
+            // Redirigir a la página de edición
+            window.location.href = `/clientes/editar/${id}`;
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            document.getElementById('clienteForm').reset();
+            document.getElementById('pensionFields').classList.add('hidden');
+        }
+
+        // Mostrar alertas
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-error';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass}">
+                    ${mensaje}
+                </div>
+            `;
+            
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Formatear tipo de cliente para mostrar
+        function formatearTipoCliente(tipo) {
+            const tipos = {
+                'particular': 'Particular',
+                'pension': 'Pensionado',
+                'empresa': 'Empresa'
+            };
+            return tipos[tipo] || tipo;
+        }
+
+        // Agregar endpoint para obtener todos los clientes
+        async function obtenerTodosClientes() {
+            try {
+                const response = await fetch('/clientes/api/buscar/todos', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al obtener clientes');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                return [];
+            }
+        }
+    </script>
+</body>
+</html>
