@@ -22,6 +22,8 @@ public class Comida {
     @Column(name = "precio", nullable = false, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal precio;
 
+	//getter y setter
+
 	public Integer getIdComida() {
 		return idComida;
 	}
@@ -53,7 +55,4 @@ public class Comida {
 	public void setPrecio(BigDecimal precio) {
 		this.precio = precio;
 	}
-
-
-    
 }
