@@ -104,96 +104,79 @@
   box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
 }
 
-  </style>
+  </style>  
 </head>
-<body>
 
-  <!-- Botón de regreso -->
-  <div class="top-right" onclick="volver()">
+<body>
+<div class="top-right" onclick="volver()">
     ⤺
   </div>
-
-    <div class="container">
-    <!-- Comida: Lomo Saltado -->
+<div class="container">
     <div class="plato">
-  <img src="lomo.png">
-  <span class="nombre">Lomo Saltado</span>
+  <img src="caldo_blanco.png">
+  <span class="nombre">CALDO BLANCO</span>
   <div class="cantidad-control">
-  <button onclick="cambiarCantidad('Lomo_Saltado', 1)">➕</button>
-  <span id="cantidad_Lomo_Saltado">0</span>
-  <button onclick="cambiarCantidad('Lomo_Saltado', -1)">➖</button>
-  </div>
-  </div>
+  <button onclick="cambiarCantidad('Caldo_Blanco', 1)">➕</button>
+  <span id="cantidad_Caldo_Blanco">0</span>
+  <button onclick="cambiarCantidad('Caldo_Blanco', -1)">➖</button>
   
+  </div>
+</div>
 
-  
-    <!-- Comida: Tallarín con pollo -->
-    <div class="plato">
-  <img src="lomo.png">
-  <span class="nombre">Tallarin con Pollo</span>
+
+
+
+
+
+<div class="plato">
+  <img src="ensalada.png">
+  <span class="nombre">ENSALADA</span>
   <div class="cantidad-control">
-  <button onclick="cambiarCantidad('Tallarin_con_Pollo', 1)">➕</button>
-  <span id="cantidad_Tallarin_con_Pollo">0</span>
-  <button onclick="camtallarin_con_pollo('Tallarin_con_Pollo', -1)">➖</button>
+  <button onclick="cambiarCantidad('Ensalada', 1)">➕</button>
+  <span id="cantidad_Ensalada">0</span>
+  <button onclick="cambiarCantidad('Ensalada', -1)">➖</button>
   </div>
-  </div>
-  
+</div>
 
 
-  
-    <!-- Comida: Matasquita de carne -->
-  <div class="plato">
-  <img src="lomo.png">
-  <span class="nombre">Matasquita de Carne</span>
+<div class="plato">
+  <img src="otro.png">
+  <span class="nombre">OTRO</span>
   <div class="cantidad-control">
-  <button onclick="cambiarCantidad('Matasquita_de_Carne', 1)">➕</button>
-  <span id="cantidad_Matasquita_de_Carne">0</span>
-  <button onclick="cambiarCantidad('Matasquita_de_Carne', -1)">➖</button>
-  </div>
-  </div>
+  <button onclick="cambiarCantidad('Otro', 1)">➕</button>
+  <span id="cantidad_Otro">0</span>
+  <button onclick="cambiarCantidad('Otro', -1)">➖</button>
   
-  </div>
-  
-
-  <!-- Botón de confirmar -->
+</div>
+</div>
+</div>
+<!-- Botón de confirmar -->
  <button class="confirmar" onclick="continuar()">🗸 </button>
-  
-  <script>
+<script>
+  // Cargar el pedido desde localStorage (si ya hay algo guardado)
   let pedido = JSON.parse(localStorage.getItem('pedido')) || {};
 
   function cambiarCantidad(plato, cambio) {
-    // Si no existe, iniciamos en 0
-    if (!pedido[plato]) {
-      pedido[plato] = 0;
-    }
+    if (!pedido[plato]) pedido[plato] = 0;
 
-    // Sumamos o restamos
     pedido[plato] += cambio;
 
-    // Evitamos números negativos
-    if (pedido[plato] < 0) {
-      pedido[plato] = 0;
-    }
+    if (pedido[plato] < 0) pedido[plato] = 0;
+    if (pedido[plato] === 0) delete pedido[plato];
 
-    // Si llega a 0, lo eliminamos del pedido
-    if (pedido[plato] === 0) {
-      delete pedido[plato];
-    }
-
-    // Actualizamos el número en pantalla
     document.getElementById('cantidad_' + plato).innerText = pedido[plato] || 0;
 
-    // Guardamos en localStorage
+    // Guardar en localStorage
     localStorage.setItem('pedido', JSON.stringify(pedido));
   }
 
   function continuar() {
-    // Aquí irías a la siguiente página
-    window.location.href = 'sopas.html';
+    window.location.href = 'gaseosas.html'; // ir al recibo final
   }
   function volver() {
-    window.location.href = 'opciones.html';
+    window.location.href = 'menu.html';
   }
-  </script>
+</script>
+
 </body>
 </html>

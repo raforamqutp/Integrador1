@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú de Categorías</title>
+  <link rel="stylesheet" href="CSS/menustyle.css">
+</head>
+<body>
+<div class="container">
+
+  <!-- Botón volver -->
+  <div class="volver">
+    <div class="boton-volver" onclick="volverSegunRol()">↩</div>
+  </div>
+
+  <!-- Opciones del menú -->
+  <a href="platos.html" class="menu-option" style="text-decoration: none; color: inherit;">
+    <img src="img/lomosaltado.jpg" alt="Platos">
+    <span>Platos</span>
+  </a>
+
+  <a href="gaseosas.html" class="menu-option" style="text-decoration: none; color: inherit;">
+    <img src="img/gaseosas.jpg" alt="Gaseosas">
+    <span>Gaseosas</span>
+  </a>
+
+  <a href="entradas.html" class="menu-option" style="text-decoration: none; color: inherit;">
+    <img src="img/entradas.jpg" alt="Entradas">
+    <span>Entradas</span>
+  </a>
+
+  <!-- Botón Ver Pedido -->
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="verpedido.html">
+      <button style="padding: 10px 20px; font-size: 16px;">Ver Pedido</button>
+    </a>
+  </div>
+
+  <!-- Botón Confirmar Pedido -->
+  <div class="confirm-button" style="text-align: center; margin-top: 20px; cursor: pointer;">
+    <span style="font-size: 18px; font-weight: bold;">CONFIRMAR PEDIDO</span>
+    <img src="confirmar.png" alt="Icono Confirmar" style="display: block; margin: 10px auto; width: 40px;">
+  </div>
+
+</div>
+
+<script>
+  function volverSegunRol() {
+    const rol = localStorage.getItem('rolUsuario');
+    if (rol === 'ADMIN') {
+      window.location.href = 'admin.html';
+    } else {
+      window.location.href = 'main.html';
+    }
+  }
+</script>
+</body>
+</html>
