@@ -12,6 +12,7 @@
       <button id="botontareas" class="btn btn-custom">Tareas</button>
       <button id="botonRegInc" class="btn btn-custom">Registrar Incidencia</button>
       <button id="botonLibroRecl"class="btn btn-custom">Libro de Reclamaciones</button>
+      <button id="botonMenu" class="btn btn-custom">Gestión de Menú</button>
 
       <div class="footer-buttons">
         <button class="btn btn-support">Soporte</button>
@@ -40,6 +41,12 @@
     botonLibroRecl.addEventListener('click', function() {
 		window.location.href = 'listar.html';
 	});
+
+    const botonMenu = document.getElementById('botonMenu');
+    botonMenu.addEventListener('click', function() {
+      window.location.href = 'menu-crud.html';
+    });
+
 	function cerrarSesion() {
       window.location.href = 'login.html';
     }
