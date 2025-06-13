@@ -181,10 +181,37 @@
                 margin-top: 10px;
             }
         }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            background: #5a6268;
+        }
+
+        .btn-back i {
+            margin-right: 5px;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
+        <button class="btn-back" onclick="window.location.href='main.html'">
+            <i class="fas fa-arrow-left"></i> Regresar al Panel
+        </button>
         <div class="header">
             <h1>🍽️ Gestión de Clientes</h1>
             <p>Sistema de Administración del Restaurante</p>
