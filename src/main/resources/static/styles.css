@@ -1,0 +1,87 @@
+a.menu-option {
+  text-decoration: none;
+  color: inherit;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  font-family: sans-serif;
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #3ba57d 35%, #dcdcdc 35%);
+  position: relative;
+  padding-top: 60px;
+}
+
+/* Botón regresar */
+.back-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #f04e4e;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Estilo para cada opción del menú */
+.menu-option {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 30px;
+  width: 85%;
+  max-width: 800px;
+  margin: 30px auto;
+  box-shadow: 3px 3px 6px #aaa;
+  padding: 15px 20px;
+}
+
+.menu-option img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+.menu-option span {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 28px;
+}
+
+/* Botón confirmar pedido */
+.confirm-button {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background-color: #f4ea2a;
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px #999;
+}
+
+.confirm-button img {
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumen de Pedido</title>
+  <link rel="stylesheet" href="recibo.css">
+</head>
+<body>
+  <div class="contenedor">
+    <div class="panel-izquierdo">
+      <div class="recibo" id="resumen"></div>
+    </div>
+    <div class="panel-derecho">
+      <button class="btn volver" onclick="nuevaOrden()">⤺</button>
+      <button class="btn continuar">→</button>
+      
+    </div>
+  </div>
+
+  <script>
+    const pedido = JSON.parse(localStorage.getItem('pedido')) || {};
+    const resumen = document.getElementById('resumen');
+
+    for (let key in pedido) {
+      const div = document.createElement('div');
+      div.className = 'item';
+
+      const etiqueta = document.createElement('span');
+      etiqueta.className = 'etiqueta';
+      etiqueta.textContent = key;
+
+      const valor = document.createElement('span');
+      valor.className = 'valor';
+      valor.textContent = pedido[key];
+
+      div.appendChild(etiqueta);
+      div.appendChild(valor);
+      resumen.appendChild(div);
+    }
+
+    function nuevaOrden() {
+      localStorage.removeItem('pedido');
+      window.location.href = 'opciones.html';
+    }
+  </script>
+</body>
+</html>

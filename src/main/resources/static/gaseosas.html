@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Menú de Comida</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(to right, #2e7b5f 40%, #e0e0e0 60%);
+  min-height: 100vh;
+  position: relative;
+}
+
+.container {
+  padding: 30px 20px 70px; /* espacio inferior para el botón verde */
+}
+
+.gaseosa {
+  background: white;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  margin: 20px auto;
+  padding: 10px 15px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+.gaseosa img {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.nombre {
+  flex: 1;
+  font-size: 15px;
+  font-style: italic;
+  text-align: left;
+}
+
+.cantidad-control {
+  background-color: #f2f2f2;
+  border-radius: 30px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+.cantidad-control button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  color: #444;
+}
+
+.cantidad-control span {
+  min-width: 20px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  background-color: #ff5f5f;
+  color: black;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+}
+
+.confirmar {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 24px;
+  background-color: #4caf50;
+  color: black;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+}
+
+  </style>
+</head>
+<body>
+
+  
+<!-- Botón volver -->
+     <div class="top-right" onclick="volver()">
+    ⤺
+  </div>
+
+
+  <div class="container">
+
+  <div class="gaseosa">
+    <img src="cocacola.png" alt="cocacola">
+    <span class="nombre">COCA COLA</span>
+    <div class="cantidad-control">
+    <button onclick="cambiarCantidad('Coca-Cola', 1)">➕</button>
+    <span id="cantidad_Coca-Cola">0</span>
+    <button onclick="cambiarCantidad('Coca-Cola', -1)">➖</button>
+    </div>
+  
+  </div>
+
+    <div class="gaseosa">
+      <img src="coca.png" alt="inkacola">
+      <span class="nombre">INKA COLA</span>
+      <div class="cantidad-control">
+        <button onclick="cambiarCantidad('Inka_Kola', 1)">➕</button>
+        <span id="cantidad_Inka_Kola">0</span>
+        <button onclick="cambiarCantidad('Inka_Kola', -1)">➖</button>
+      </div>
+      
+    </div>
+
+  
+    <div class="gaseosa">
+      <img src="sprite.png" alt="Sprite">
+      <span class="nombre">SPRITE</span>
+      <div class="cantidad-control">
+        <button onclick="cambiarCantidad('Sprite', 1)">➕</button>
+        <span id="cantidad_Sprite">0</span>
+        <button onclick="cambiarCantidad('Sprite', -1)">➖</button>
+      </div>
+      
+    </div>
+
+
+    <div class="gaseosa">
+      <img src="fanta.png" alt="Fanta">
+      <span class="nombre">FANTA</span>
+      <div class="cantidad-control">
+        <button onclick="cambiarCantidad('Fanta', 1)">➕</button>
+        <span id="cantidad_Fanta">0</span>
+        <button onclick="cambiarCantidad('Fanta', -1)">➖</button>
+      </div>
+      
+    </div>
+
+  </div>
+
+ <!-- Botón para continuar al recibo -->
+<button class = " confirmar "onclick="continuar()">🗸 </button>
+
+ 
+   <script>
+ // Cargamos el pedido actual, o lo inicializamos vacío
+  let pedido = JSON.parse(localStorage.getItem('pedido')) || {};
+
+  function cambiarCantidad(nombre, cantidad) {
+    if (!pedido[nombre]) pedido[nombre] = 0;
+
+    pedido[nombre] += cantidad;
+
+    if (pedido[nombre] < 0) pedido[nombre] = 0;
+    if (pedido[nombre] === 0) delete pedido[nombre];
+
+    // Mostrar cantidad en pantalla
+    document.getElementById('cantidad_' + nombre).innerText = pedido[nombre] || 0;
+
+    // Guardamos el pedido actualizado
+    localStorage.setItem('pedido', JSON.stringify(pedido));
+  }
+
+  function continuar() {
+    // Ir a la página final del recibo
+    window.location.href = 'recibo.html';
+  }
+  function volver() {
+    window.location.href = 'sopas.html';
+  }
+</script>
+  
+
+</body>
+</html>

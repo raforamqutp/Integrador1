@@ -22,6 +22,8 @@ public class Bebida {
     @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
+	//getter y setter
+
 	public Integer getIdBebida() {
 		return idBebida;
 	}
@@ -47,12 +49,10 @@ public class Bebida {
 	}
 
 	public BigDecimal getPrecio() {
-        return precio;
-    }
+		return precio;
+	}
 
 	public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
-
-    
+		this.precio = precio;
+	}
 }
