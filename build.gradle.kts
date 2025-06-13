@@ -1,16 +1,16 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.4"
-	id("io.spring.dependency-management") version "1.1.7"
+	id("org.springframework.boot") version "3.2.3"
+	id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+
 }
 
 repositories {
@@ -18,15 +18,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.mysql:mysql-connector-j:8.1.0")  
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("com.mysql:mysql-connector-j:8.0.33")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+	implementation("org.apache.poi:poi:5.2.5")
+	implementation("org.apache.poi:poi-ooxml:5.2.5")
 
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+
 }
