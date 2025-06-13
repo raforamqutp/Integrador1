@@ -9,9 +9,9 @@
   <div class="container-panel">
     <!-- Panel izquierdo -->
     <div class="panel">
-      <button id="botonmenu" class="btn btn-custom">Menú</button>
-      <button id="botonhistoria" class="btn btn-custom">Historial</button>
-      <button class="btn btn-custom">Tareas</button>
+      <button id="botontareas" class="btn btn-custom">Tareas</button>
+      <button id="botonRegInc" class="btn btn-custom">Registrar Incidencia</button>
+      <button id="botonLibroRecl"class="btn btn-custom">Libro de Reclamaciones</button>
 
       <div class="footer-buttons">
         <button class="btn btn-support">Soporte</button>
@@ -25,19 +25,25 @@
 
   <script>
 
-	const botonmenu = document.getElementById('botonmenu');
+	const botontareas = document.getElementById('botontareas');
 
-	botonmenu .addEventListener('click', function() {
-		window.location.href = 'menu.html';
+	botontareas .addEventListener('click', function() {
+		window.location.href = 'Tareas.html';
 	});
-	const botonhistoria = document.getElementById('botonhistoria');
+	const botonRegInc = document.getElementById('botonRegInc');
 
-	botonhistoria.addEventListener('click', function() {
-		window.location.href = 'historial.html';
+	botonRegInc.addEventListener('click', function() {
+		window.location.href = 'formulario.html';
 	});
-    function cerrarSesion() {
+    const botonLibroRecl = document.getElementById('botonLibroRecl');
+
+    botonLibroRecl.addEventListener('click', function() {
+		window.location.href = 'listar.html';
+	});
+	function cerrarSesion() {
       window.location.href = 'login.html';
     }
+  
   </script>
 </body>
 </html>
