@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú Admin</title>
+  <link rel="stylesheet" href="CSS/adminstyle.css">
+</head>
+<body>
+  <div class="container-panel">
+    <!-- Panel izquierdo -->
+    <div class="panel">
+      <button id="botonmenu" class="btn btn-custom">Menú</button>
+      <button id="botonhistoria" class="btn btn-custom">Historial</button>
+      <button class="btn btn-custom">Tareas</button>
+
+      <div class="footer-buttons">
+        <button class="btn btn-support">Soporte</button>
+        <button class="btn btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- Logo -->
+    <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
+  </div>
+
+  <script>
+
+	const botonmenu = document.getElementById('botonmenu');
+
+	botonmenu .addEventListener('click', function() {
+		window.location.href = 'menu.html';
+	});
+	const botonhistoria = document.getElementById('botonhistoria');
+
+	botonhistoria.addEventListener('click', function() {
+		window.location.href = 'historial.html';
+	});
+    function cerrarSesion() {
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen del Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to left, #e0e0e0, #1b6b57);
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .table-container {
+            margin-bottom: 30px;
+        }
+
+        .table thead th {
+            background-color: #1b6b57;
+            color: white;
+        }
+
+        .btn-eliminar {
+            background-color: #e74c3c;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-volver {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+        .btn-volver:hover {
+            background-color: #6c7a7d;
+            color: white;
+        }
+
+        .btn-generar {
+            background-color: #2ecc71;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-generar:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+        }
+
+        .boton-volver {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #e74c3c;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        .total-section {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #1b6b57;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+<a href="platos.html" class="boton-volver">↩</a>
+
+<div class="container">
+    <h2 class="text-center my-4">Resumen del Pedido</h2>
+
+    <div class="table-container">
+        <h5>Platos</h5>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Plato</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="detallesPlatos"></tbody>
+        </table>
+
+        <h5>Bebidas</h5>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Bebida</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="detallesBebidas"></tbody>
+        </table>
+
+        <div id="total-container" class="total-section">
+            <span>Total:</span>
+            <span id="total-pedido">S/. 0.00</span>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="platos.html" class="btn btn-volver">Volver</a>
+        <button onclick="mostrarReporte()" class="btn btn-generar" id="btn-generar-pedido">
+            Ver Reporte del Pedido
+        </button>
+    </div>
+</div>
+
+<!-- Mantener todo el código existente hasta la sección del script -->
+<script>
+    let pedido = {};
+
+    function mostrarResumen() {
+      const data = localStorage.getItem("pedidoSeleccion");
+      if (!data) return;
+
+      pedido = JSON.parse(data);
+      const tbodyPlatos = document.getElementById("detallesPlatos");
+      const tbodyBebidas = document.getElementById("detallesBebidas");
+      tbodyPlatos.innerHTML = "";
+      tbodyBebidas.innerHTML = "";
+
+      let total = 0;
+
+      // Mostrar platos
+      Object.entries(pedido.platos || {}).forEach(([plato, item]) => {
+        if (item.cantidad > 0) {
+          const subtotal = item.cantidad * item.precio;
+          total += subtotal;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${plato}</td>
+            <td>${item.cantidad}</td>
+            <td>S/. ${item.precio.toFixed(2)}</td>
+            <td>S/. ${subtotal.toFixed(2)}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="eliminarItem('platos','${plato}', ${item.precio})">Eliminar</button></td>
+          `;
+          tbodyPlatos.appendChild(tr);
+        }
+      });
+
+      // Mostrar bebidas
+      Object.entries(pedido.bebidas || {}).forEach(([bebida, item]) => {
+        if (item.cantidad > 0) {
+          const subtotal = item.cantidad * item.precio;
+          total += subtotal;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${bebida}</td>
+            <td>${item.cantidad}</td>
+            <td>S/. ${item.precio.toFixed(2)}</td>
+            <td>S/. ${subtotal.toFixed(2)}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="eliminarItem('bebidas','${bebida}', ${item.precio})">Eliminar</button></td>
+          `;
+          tbodyBebidas.appendChild(tr);
+        }
+      });
+
+      // Actualizar total
+      document.getElementById("total-pedido").textContent = `S/. ${total.toFixed(2)}`;
+    }
+
+    function eliminarItem(tipo, nombre, precio) {
+      if (pedido[tipo] && pedido[tipo][nombre]) {
+        // Restar del total
+        const totalElement = document.getElementById("total-pedido");
+        const totalActual = parseFloat(totalElement.textContent.replace("S/. ", ""));
+        const nuevoTotal = totalActual - (precio * pedido[tipo][nombre].cantidad);
+        totalElement.textContent = `S/. ${nuevoTotal.toFixed(2)}`;
+
+        // Eliminar item
+        delete pedido[tipo][nombre];
+        localStorage.setItem("pedidoSeleccion", JSON.stringify(pedido));
+        mostrarResumen();
+      }
+    }
+
+    function mostrarReporte() {
+      // Guardar el pedido actualizado
+      localStorage.setItem("pedidoSeleccion", JSON.stringify(pedido));
+
+      // Redirigir a la página de reporte
+      window.location.href = "ascii.html";
+    }
+
+    window.onload = mostrarResumen;
+</script>
+</body>
+</html>

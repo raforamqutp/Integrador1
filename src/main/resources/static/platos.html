@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Menú de Comidas y Bebidas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to left, #e0e0e0, #1b6b57);
+      min-height: 100vh;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      position: relative;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .boton-volver {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #e74c3c;
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+    }
+
+    .category-buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      gap: 15px;
+    }
+
+    .category-btn {
+      padding: 10px 25px;
+      border-radius: 25px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .category-btn.active {
+      background-color: #2ecc71;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .category-btn:not(.active) {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    .card-menu {
+      background-color: white;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .card-menu:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-menu img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 15px;
+    }
+
+    .dish-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-grow: 1;
+    }
+
+    .contador-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .contador {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin: 0 15px;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .btn-circle {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .boton-reporte {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 12px 25px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+
+    .boton-reporte:hover {
+      background-color: #27ae60;
+      transform: scale(1.05);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .no-items {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<!-- El resto de tu HTML se mantiene igual -->
+<a href="menu.html" class="boton-volver">↩</a>
+
+<div class="container">
+  <div class="category-buttons">
+    <button class="category-btn active" id="btn-platos" onclick="mostrarCategoria('platos')">Platos</button>
+    <button class="category-btn" id="btn-bebidas" onclick="mostrarCategoria('bebidas')">Bebidas</button>
+  </div>
+
+  <!-- Sección de Platos -->
+  <div id="seccion-platos">
+    <!-- Las tarjetas se generarán dinámicamente -->
+  </div>
+
+  <!-- Sección de Bebidas -->
+  <div id="seccion-bebidas" class="hidden">
+    <!-- Las tarjetas se generarán dinámicamente -->
+  </div>
+</div>
+
+<button onclick="verResumen()" class="boton-reporte hidden" id="btn-ver-resumen">
+  Ver Resumen
+</button>
+
+<script>
+  // Datos de productos
+  const productos = {
+    platos: [
+      { nombre: "LOMO SALTADO", img: "img/lomosaltado.jpg", precio: 12.00 },
+      { nombre: "TALLARIN CON POLLO", img: "img/tallarinconpollo.png", precio: 17.00 },
+      { nombre: "MATASQUITA DE CARNE", img: "img/matasquita.jpg", precio: 8.00 }
+    ],
+    bebidas: [
+      { nombre: "INCA KOLA", img: "img/incakola.png", precio: 4.00 },
+      { nombre: "COCA COLA", img: "img/cocacola.png", precio: 4.00 },
+      { nombre: "AGUA MINERAL", img: "img/agua.png", precio: 2.50 }
+    ]
+  };
+
+  // Estado del pedido
+  let pedido = {
+    platos: {},
+    bebidas: {}
+  };
+
+  // Inicializar el pedido con valores por defecto
+  function inicializarPedido() {
+    productos.platos.forEach(plato => {
+      pedido.platos[plato.nombre] = {
+        cantidad: 0,  // Inicializar en 0 para evitar NaN
+        precio: plato.precio
+      };
+    });
+
+    productos.bebidas.forEach(bebida => {
+      pedido.bebidas[bebida.nombre] = {
+        cantidad: 0,  // Inicializar en 0 para evitar NaN
+        precio: bebida.precio
+      };
+    });
+  }
+
+  // Cargar pedido guardado
+  function cargarPedidoGuardado() {
+    const guardado = localStorage.getItem("pedidoSeleccion");
+    if (guardado) {
+      try {
+        const datos = JSON.parse(guardado);
+
+        // Actualizar solo las cantidades, manteniendo los precios
+        for (const tipo in datos) {
+          for (const producto in datos[tipo]) {
+            if (pedido[tipo] && pedido[tipo][producto]) {
+              // Convertir a número y asegurar que no sea NaN
+              const cantidad = Number(datos[tipo][producto].cantidad) || 0;
+              pedido[tipo][producto].cantidad = cantidad;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error al cargar pedido:", e);
+      }
+    }
+  }
+
+  // Generar las tarjetas de productos
+  function generarTarjetas() {
+    const seccionPlatos = document.getElementById("seccion-platos");
+    const seccionBebidas = document.getElementById("seccion-bebidas");
+
+    seccionPlatos.innerHTML = '';
+    seccionBebidas.innerHTML = '';
+
+    // Generar tarjetas de platos
+    productos.platos.forEach(plato => {
+      const cantidad = pedido.platos[plato.nombre]?.cantidad || 0;
+      const card = crearTarjetaProducto('platos', plato, cantidad);
+      seccionPlatos.appendChild(card);
+    });
+
+    // Generar tarjetas de bebidas
+    productos.bebidas.forEach(bebida => {
+      const cantidad = pedido.bebidas[bebida.nombre]?.cantidad || 0;
+      const card = crearTarjetaProducto('bebidas', bebida, cantidad);
+      seccionBebidas.appendChild(card);
+    });
+  }
+
+  // Crear una tarjeta de producto individual
+  function crearTarjetaProducto(tipo, producto, cantidad) {
+    const card = document.createElement("div");
+    card.className = "card-menu";
+    card.innerHTML = `
+      <img src="${producto.img}" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/80x80?text=${producto.nombre.replace(/ /g, '+')}'">
+      <div class="dish-name">${producto.nombre}</div>
+      <div class="contador-container">
+        <button class="btn btn-outline-dark btn-circle" onclick="modificarCantidad('${tipo}', '${producto.nombre}', -1)">−</button>
+        <span id="contador-${tipo}-${producto.nombre.replace(/ /g, '-')}" class="contador">${cantidad}</span>
+        <button class="btn btn-outline-dark btn-circle" onclick="modificarCantidad('${tipo}', '${producto.nombre}', 1)">+</button>
+      </div>
+    `;
+    return card;
+  }
+
+  // Modificar cantidad de un producto
+  function modificarCantidad(tipo, nombre, cambio) {
+    // Asegurarse de que la cantidad sea un número
+    const cantidadActual = Number(pedido[tipo][nombre].cantidad) || 0;
+    const nuevaCantidad = Math.max(0, cantidadActual + cambio);
+
+    pedido[tipo][nombre].cantidad = nuevaCantidad;
+
+    // Actualizar contador visual
+    actualizarContador(tipo, nombre);
+
+    // Guardar en localStorage
+    guardarPedido();
+
+    // Actualizar botón de resumen
+    actualizarBotonResumen();
+  }
+
+  // Actualizar contador visual
+  function actualizarContador(tipo, nombre) {
+    const id = `contador-${tipo}-${nombre.replace(/ /g, '-')}`;
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      elemento.textContent = pedido[tipo][nombre].cantidad;
+    }
+  }
+
+  // Guardar pedido en localStorage
+  function guardarPedido() {
+    localStorage.setItem("pedidoSeleccion", JSON.stringify(pedido));
+  }
+
+  // Mostrar/ocultar botón de resumen
+  function actualizarBotonResumen() {
+    const btnResumen = document.getElementById("btn-ver-resumen");
+    let tieneItems = false;
+
+    for (const tipo in pedido) {
+      for (const producto in pedido[tipo]) {
+        if (pedido[tipo][producto].cantidad > 0) {
+          tieneItems = true;
+          break;
+        }
+      }
+      if (tieneItems) break;
+    }
+
+    btnResumen.classList.toggle("hidden", !tieneItems);
+  }
+
+  // Mostrar categoría seleccionada
+  function mostrarCategoria(categoria) {
+    document.getElementById("seccion-platos").classList.toggle("hidden", categoria !== "platos");
+    document.getElementById("seccion-bebidas").classList.toggle("hidden", categoria !== "bebidas");
+
+    document.getElementById("btn-platos").classList.toggle("active", categoria === "platos");
+    document.getElementById("btn-bebidas").classList.toggle("active", categoria === "bebidas");
+  }
+
+  // Ir a la página de resumen
+  function verResumen() {
+    guardarPedido();
+    window.location.href = "resumen.html";
+  }
+
+  // Inicialización
+  document.addEventListener("DOMContentLoaded", function() {
+    inicializarPedido();
+    cargarPedidoGuardado();
+    generarTarjetas();
+    mostrarCategoria("platos");
+    actualizarBotonResumen();
+  });
+</script>
+</body>
+</html>
