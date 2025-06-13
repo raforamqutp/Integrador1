@@ -14,6 +14,7 @@
     <div class="panel">
       <button id="botonmenu" class="btn btn-custom">Menú</button>
       <button id="botonhistoria"class="btn btn-custom">Historial</button>
+      <button id="botonClientes" class="btn btn-custom">Clientes</button>
 
       <div class="footer-buttons mt-auto">
         <button class="btn btn-support">Soporte</button>
@@ -25,22 +26,26 @@
     <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
   </div>
 <script>
-		const botonCerrar = document.getElementById('botonCerrar');
+  const botonCerrar = document.getElementById('botonCerrar');
+  const botonmenu = document.getElementById('botonmenu');
+  const botonhistoria = document.getElementById('botonhistoria');
+  const botonClientes = document.getElementById('botonClientes');
 
-		botonCerrar.addEventListener('click', function() {
-			window.location.href = 'login.html';
-		});
-		
-		const botonmenu = document.getElementById('botonmenu');
+  botonCerrar.addEventListener('click', function() {
+    window.location.href = 'login.html';
+  });
 
-		botonmenu .addEventListener('click', function() {
-			window.location.href = 'menu.html';
-		});
-		const botonhistoria = document.getElementById('botonhistoria');
+  botonmenu.addEventListener('click', function() {
+    window.location.href = 'menu.html';
+  });
 
-		botonhistoria.addEventListener('click', function() {
-			window.location.href = 'historial.html';
-		});
+  botonhistoria.addEventListener('click', function() {
+    window.location.href = 'historial.html';
+  });
+
+  botonClientes.addEventListener('click', function() {
+    window.location.href = 'gestion-clientes.html';
+  });
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>

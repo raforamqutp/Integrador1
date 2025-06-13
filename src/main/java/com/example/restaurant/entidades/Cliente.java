@@ -1,6 +1,8 @@
 package com.example.restaurant.entidades;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,10 +20,10 @@ public class Cliente {
     @Column(name = "tipo_cliente", nullable = false)
     private TipoCliente tipoCliente;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente")
     private List<Pension> pensiones;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente")
     private List<Pedido> pedidos;
 
 	public Integer getIdCliente() {
@@ -62,6 +64,10 @@ public class Cliente {
 
 	public void setPedidos(List<Pedido> pedidos) {
 		this.pedidos = pedidos;
+	}
+	public Cliente() {
+	    this.pensiones = new ArrayList<>();
+	    this.pedidos = new ArrayList<>();
 	}
 
 
