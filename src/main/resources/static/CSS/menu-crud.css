@@ -48,6 +48,7 @@ h1 {
     font-weight: bold;
 }
 
+/* ELIMINAR ESTAS REGLAS PROBLEMÁTICAS:
 .tab-content {
     display: none;
 }
@@ -55,6 +56,7 @@ h1 {
 .tab-content.active {
     display: block;
 }
+*/
 
 .crud-actions {
     display: flex;
@@ -200,4 +202,44 @@ h1 {
 
 .btn-save:hover {
     background-color: #2980b9;
+}
+
+
+
+/* nuevo */
+
+.close-modal {
+     color: #aaa;
+     float: right;
+     font-size: 28px;
+     font-weight: bold;
+     cursor: pointer;
+}
+
+.close-modal:hover {
+     color: black;
+}
+
+.crud-container > div {
+    display: block !important;
+}
+
+.crud-actions {
+    display: flex;
+    justify-content: flex-start; /* Alinear a la izquierda */
+    margin-bottom: 20px;
+    width: 100%; /* Asegurar ancho completo */
+}
+
+.tab-content {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Forzar visibilidad de botones */
+.btn-add {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
