@@ -7,4 +7,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     // Query automática por nombre de método
 	Usuario findByNombreUsuarioAndContrasena(String nombreUsuario, String contrasena);
 
+	Usuario findByNombreUsuario(String nombreUsuario);
+
 }

@@ -4,6 +4,7 @@ public class ItemDTO {
     private String nombre;
     private String categoria;
     private int cantidad;
+    private double precio;
 
     // Getters y Setters
     public String getNombre() { return nombre; }
@@ -14,4 +15,11 @@ public class ItemDTO {
 
     public int getCantidad() { return cantidad; }
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+	
+    public double getPrecio() {
+		return precio;
+	}
+	public void setPrecio(double precio) {
+		this.precio = precio;
+	}
 }

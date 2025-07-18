@@ -2,25 +2,26 @@
 <html lang="es">
 
 <head>
-	<meta charset="UTF-8">
-	<title>Login - El sabor de Marcona</title>
-	<link rel="stylesheet" href="CSS/stylelogin.css">
+<meta charset="UTF-8">
+<title>Login - El sabor de Marcona</title>
+<link rel="stylesheet" href="CSS/stylelogin.css">
 </head>
 
 <body>
 	<div class="container">
 		<div class="logo">
 			<img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona">
-			<p>El sabor de <br><strong>Marcona</strong></p>
+			<p>
+				El sabor de <br> <strong>Marcona</strong>
+			</p>
 		</div>
 
 		<div class="login-box">
 			<h2>BIENVENIDO</h2>
-			<label for="usuario">USUARIO</label>
-			<input type="text" id="usuario" placeholder="Ingrese su usuario">
-
-			<label for="contrasena">CONTRASEÑA</label>
-			<input type="password" id="contrasena" placeholder="Ingrese su contraseña">
+			<label for="usuario">USUARIO</label> <input type="text" id="usuario"
+				placeholder="Ingrese su usuario"> <label for="contrasena">CONTRASEÑA</label>
+			<input type="password" id="contrasena"
+				placeholder="Ingrese su contraseña">
 
 			<button id="botonIngresar">INGRESAR</button>
 		</div>
@@ -28,41 +29,48 @@
 	<script>
 		const botonIngresar = document.getElementById('botonIngresar');
 	
-		botonIngresar.addEventListener('click', function () {
-			const nombreUsuario = document.getElementById('usuario').value;
-			const contrasena = document.getElementById('contrasena').value;
-	
-			fetch('http://localhost:8081/usuarios/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					nombreUsuario: nombreUsuario,
-					contrasena: contrasena
-				})
-			})
-				.then(response => response.text())
-				.then(data => {
-					if (data === 'ADMIN') {
-						localStorage.setItem('rolUsuario', 'ADMIN');
-						window.location.href = 'admin.html';
-					} else if (data === 'USER') {
-						localStorage.setItem('rolUsuario', 'USER');
-						window.location.href = 'main.html';
-					} else {
-						alert('Usuario o contraseña incorrectos');
-					}
-				})
-					
-				.catch(error => {
-					console.error('Error al iniciar sesión:', error);
-					alert('Ingrese una cuenta correcta');
-				});
+		botonIngresar.addEventListener('click', function() {
+		    const nombreUsuario = document.getElementById('usuario').value;
+		    const contrasena = document.getElementById('contrasena').value;
+
+		    fetch('http://localhost:8081/api/auth/login', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json'
+		        },
+		        body: JSON.stringify({
+		            nombreUsuario: nombreUsuario,
+		            contrasena: contrasena
+		        })
+		    })
+		    .then(response => {
+		        if (!response.ok) {
+		            throw new Error('Credenciales incorrectas');
+		        }
+		        return response.json(); // Cambiado de text() a json()
+		    })
+		    .then(data => {
+		        // Asegúrate que data.rol existe (si devuelves un objeto JSON)
+		        const rol = data.rol || data; // Soporta tanto objetos como texto plano
+		        
+		        if (rol === 'ADMIN') {
+		            localStorage.setItem('rolUsuario', 'ADMIN');
+		            window.location.href = 'admin.html';
+		        } else if (rol === 'USER') {
+		            localStorage.setItem('rolUsuario', 'USER');
+		            window.location.href = 'main.html';
+		        } else {
+		            alert('Rol no reconocido');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error al iniciar sesión:', error);
+		        alert(error.message || 'Error al iniciar sesión');
+		    });
 		});
 </script>
 
-	
+
 </body>
 
 </html>

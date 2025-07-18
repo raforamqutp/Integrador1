@@ -1,11 +1,14 @@
 package com.example.restaurant.entidades;
 
 import jakarta.persistence.*;
+
+import java.util.Collection;
 import java.util.List;
+import com.example.restaurant.entidades.Rol;
 
 @Entity
 @Table(name = "Usuario")
-public class Usuario {
+public class Usuario {  // Implementa UserDetails
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,13 +21,16 @@ public class Usuario {
     @Column(name = "Contrasena", nullable = false)
     private String contrasena;
 
+    @Enumerated(EnumType.STRING)  // Usamos Enum en lugar de String
     @Column(name = "Rol", nullable = false)
-    private String rol;
+    private Rol rol;  // Ahora es un Enum
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Pedido> pedidos;
 
-    // Getters y Setters
+    // ----- Métodos de UserDetails -----
+ 
+    // Getters y Setters (sin cambios, pero ajustados para el Enum)
     public Integer getIdUsuario() { return idUsuario; }
     public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
 
@@ -34,10 +40,13 @@ public class Usuario {
     public String getContrasena() { return contrasena; }
     public void setContrasena(String contrasena) { this.contrasena = contrasena; }
 
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+    public Rol getRol() { return rol; }
+    public void setRol(Rol rol) { this.rol = rol; }
+    
+    public String notfoundRol () {
+    	return "ERROR";
+    }
 
-    public List<Pedido> getPedidos() { return pedidos; }
-    public void setPedidos(List<Pedido> pedidos) { this.pedidos = pedidos; }
-}
 
+		
+	}
