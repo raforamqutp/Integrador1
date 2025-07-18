@@ -8,24 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
-
 @RequestMapping("/clientes")
+@CrossOrigin(origins = "*")
 public class ClienteController {
 	
     @Autowired
     private ClienteService clienteService;
+    
+    @Autowired
     private ClienteRepository clienteRepository;
     
     /**
@@ -37,74 +33,190 @@ public class ClienteController {
     }
     
     /**
-     * Procesa el registro de un nuevo cliente
+     * ✅ GUARDAR CLIENTE - CORREGIDO
      */
-    // Guardar cliente
-    
     @PostMapping("/guardar")
     @ResponseBody
     public ResponseEntity<?> guardarCliente(@RequestBody Cliente cliente) {
         try {
-            System.out.println("Entrando a guardarCliente...");
+            System.out.println("🔄 Guardando cliente...");
+            System.out.println("📊 Datos recibidos: " + cliente.toString());
 
-            String nombreCliente = cliente.getNombreCliente();
+            // Validar tipo de cliente
             TipoCliente tipo = cliente.getTipoCliente();
-
-            if (nombreCliente == null || nombreCliente.length() < 3 || nombreCliente.length() > 100) {
-                return ResponseEntity.badRequest().body("Nombre inválido");
-            }
-
             if (tipo == null) {
                 return ResponseEntity.badRequest().body("Tipo de cliente inválido");
             }
 
-            clienteService.guardarCliente(cliente);
-            return ResponseEntity.ok("Cliente guardado");
+            // Validación según el tipo
+            if (tipo == TipoCliente.PARTICULAR) {
+                String nombreCliente = cliente.getNombreCliente();
+                if (nombreCliente == null || nombreCliente.trim().length() < 3 || nombreCliente.trim().length() > 100) {
+                    return ResponseEntity.badRequest().body("Nombre debe tener entre 3 y 100 caracteres");
+                }
+                cliente.setNombreCliente(nombreCliente.trim());
+                
+            } else if (tipo == TipoCliente.PENSION) {
+                String dni = cliente.getDni();
+                String nombres = cliente.getNombres();
+                String apellidos = cliente.getApellidos();
+                
+                if (dni == null || !dni.matches("\\d{8}")) {
+                    return ResponseEntity.badRequest().body("DNI debe tener exactamente 8 dígitos");
+                }
+                
+                if (nombres == null || nombres.trim().length() < 2) {
+                    return ResponseEntity.badRequest().body("Nombres son obligatorios (mínimo 2 caracteres)");
+                }
+                
+                if (apellidos == null || apellidos.trim().length() < 2) {
+                    return ResponseEntity.badRequest().body("Apellidos son obligatorios (mínimo 2 caracteres)");
+                }
+                
+                // Verificar si ya existe el DNI
+                if (clienteRepository.existsByDni(dni)) {
+                    return ResponseEntity.badRequest().body("Ya existe un cliente con el DNI: " + dni);
+                }
+                
+                cliente.setDni(dni.trim());
+                cliente.setNombres(nombres.trim());
+                cliente.setApellidos(apellidos.trim());
+            }
+
+            Cliente clienteGuardado = clienteRepository.save(cliente);
+            
+            System.out.println("✅ Cliente guardado exitosamente con ID: " + clienteGuardado.getIdCliente());
+            
+            return ResponseEntity.ok("Cliente guardado exitosamente");
 
         } catch (Exception e) {
+            System.err.println("❌ Error al guardar cliente: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error interno");
+            return ResponseEntity.internalServerError().body("Error interno: " + e.getMessage());
         }
     }
 
-
+    /**
+     * ✅ OBTENER TODOS LOS CLIENTES - CORREGIDO
+     */
+    @GetMapping("/api/buscar/todos")
+    @ResponseBody
+    public ResponseEntity<?> obtenerTodosClientes() {
+        try {
+            System.out.println("🔄 Cargando todos los clientes...");
+            
+            List<Cliente> clientes = clienteRepository.findAll();
+            
+            // Forzar carga de propiedades lazy solo si es necesario
+            for (Cliente cliente : clientes) {
+                // No cargar pensiones ni pedidos para evitar lazy loading issues
+                if (cliente.getTipoCliente() == TipoCliente.PENSION) {
+                    // Asegurar que los campos del pensionado estén disponibles
+                    cliente.getNombreCompleto();
+                }
+            }
+            
+            System.out.println("📊 Clientes encontrados: " + clientes.size());
+            
+            return ResponseEntity.ok(clientes);
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error al cargar clientes: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al cargar clientes: " + e.getMessage());
+        }
+    }
     
-
-
+    /**
+     * ✅ OBTENER CLIENTES PENSIONADOS - CORREGIDO
+     */
+    @GetMapping("/api/tipo/{tipo}")
+    @ResponseBody
+    public ResponseEntity<?> buscarPorTipo(@PathVariable("tipo") String tipo) {
+        try {
+            System.out.println("🔄 Buscando clientes de tipo: " + tipo);
+            
+            TipoCliente tipoCliente = TipoCliente.valueOf(tipo.toUpperCase());
+            List<Cliente> clientes = clienteRepository.findByTipoCliente(tipoCliente);
+            
+            System.out.println("📊 Clientes de tipo " + tipo + " encontrados: " + clientes.size());
+            
+            return ResponseEntity.ok(clientes);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Tipo de cliente inválido: " + tipo);
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error al buscar clientes por tipo: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al buscar clientes: " + e.getMessage());
+        }
+    }
     
     /**
      * Actualiza un cliente existente
      */
     @PostMapping("/actualizar/{id}")
     @ResponseBody
-    public ResponseEntity<?> actualizarCliente(@PathVariable Integer id,
-                                             @RequestParam String nombreCliente,
-                                             @RequestParam String tipoCliente) {
+    public ResponseEntity<?> actualizarCliente(@PathVariable("id") Integer id,
+                                             @RequestParam("nombreCliente") String nombreCliente,
+                                             @RequestParam("tipoCliente") String tipoCliente) {
         try {
-            TipoCliente tipo = TipoCliente.valueOf(tipoCliente.toLowerCase());
+            TipoCliente tipo = TipoCliente.valueOf(tipoCliente.toUpperCase());
             clienteService.actualizarCliente(id, nombreCliente, tipo);
             
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Cliente actualizado exitosamente");
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al actualizar el cliente");
+                    .body("Error al actualizar el cliente: " + e.getMessage());
         }
     }
     
     /**
-     * Elimina un cliente
+     * ✅ ELIMINAR CLIENTE - CORREGIDO
      */
     @PostMapping("/eliminar/{id}")
     @ResponseBody
-    public ResponseEntity<?> eliminarCliente(@PathVariable Integer id) {
+    public ResponseEntity<?> eliminarCliente(@PathVariable("id") Integer id) {
         try {
-            clienteService.eliminarCliente(id);
-            return ResponseEntity.ok().build();
+            System.out.println("🔄 Eliminando cliente con ID: " + id);
+            
+            // Verificar si el cliente existe
+            Optional<Cliente> clienteOpt = clienteRepository.findById(id);
+            if (!clienteOpt.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Cliente cliente = clienteOpt.get();
+            
+            // Verificar si tiene pedidos asociados (sin cargar la colección completa)
+            boolean tienePedidos = cliente.getPedidos() != null && !cliente.getPedidos().isEmpty();
+            if (tienePedidos) {
+                return ResponseEntity.badRequest()
+                    .body("No se puede eliminar el cliente porque tiene pedidos asociados");
+            }
+            
+            // Verificar si tiene pensiones asociadas (sin cargar la colección completa)
+            boolean tienePensiones = cliente.getPensiones() != null && !cliente.getPensiones().isEmpty();
+            if (tienePensiones) {
+                return ResponseEntity.badRequest()
+                    .body("No se puede eliminar el cliente porque tiene pensiones asociadas");
+            }
+            
+            clienteRepository.delete(cliente);
+            
+            System.out.println("✅ Cliente eliminado exitosamente");
+            
+            return ResponseEntity.ok("Cliente eliminado exitosamente");
             
         } catch (Exception e) {
+            System.err.println("❌ Error al eliminar cliente: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar el cliente");
+                    .body("Error al eliminar el cliente: " + e.getMessage());
         }
     }
     
@@ -113,7 +225,7 @@ public class ClienteController {
      */
     @GetMapping("/api/buscar/{id}")
     @ResponseBody
-    public ResponseEntity<?> buscarClienteApi(@PathVariable Integer id) {
+    public ResponseEntity<?> buscarClienteApi(@PathVariable("id") Integer id) {
         try {
             Optional<Cliente> cliente = clienteService.buscarClientePorId(id);
             
@@ -134,7 +246,7 @@ public class ClienteController {
      */
     @GetMapping("/api/editar/{id}")
     @ResponseBody
-    public ResponseEntity<?> obtenerClienteParaEditar(@PathVariable Integer id) {
+    public ResponseEntity<?> obtenerClienteParaEditar(@PathVariable("id") Integer id) {
         try {
             Optional<Cliente> cliente = clienteService.buscarClientePorId(id);
             
@@ -150,42 +262,9 @@ public class ClienteController {
         }
     }
     
-    /**
-     * Busca clientes por tipo (API REST)
-     */
-    @GetMapping("/api/tipo/{tipo}")
-    @ResponseBody
-    public ResponseEntity<List<Cliente>> buscarPorTipo(@PathVariable String tipo) {
-        try {
-            TipoCliente tipoCliente = TipoCliente.valueOf(tipo.toLowerCase());
-            List<Cliente> clientes = clienteService.buscarClientesPorTipo(tipoCliente);
-            
-            return ResponseEntity.ok(clientes);
-            
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-            
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-    
-    /**
-     * Obtiene todos los clientes (API REST)
-     */
-    @GetMapping("/api/buscar/todos")
-    @ResponseBody
-    public ResponseEntity<List<Cliente>> obtenerTodosClientes() {
-        try {
-            List<Cliente> clientes = clienteService.listarClientes();
-            return ResponseEntity.ok(clientes);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
     @GetMapping("/api/buscar")
     @ResponseBody
-    public ResponseEntity<List<Cliente>> buscarPorNombre(@RequestParam(required = false) String nombre) {
+    public ResponseEntity<List<Cliente>> buscarPorNombre(@RequestParam(value = "nombre", required = false) String nombre) {
         try {
             List<Cliente> clientes;
 
@@ -203,7 +282,7 @@ public class ClienteController {
     
     @GetMapping("/cajero/busqueda-rapida")
     @ResponseBody
-    public ResponseEntity<List<Cliente>> busquedaRapida(@RequestParam("termino") String termino) {
+    public ResponseEntity<List<Cliente>> busquedaRapida(@RequestParam(value = "termino") String termino) {
         try {
             if (termino == null || termino.trim().isEmpty()) {
                 return ResponseEntity.badRequest().build();
@@ -216,7 +295,4 @@ public class ClienteController {
         }
         
     }
-    
-
- 
 }

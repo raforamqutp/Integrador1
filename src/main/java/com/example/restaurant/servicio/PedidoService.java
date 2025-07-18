@@ -1,155 +1,116 @@
 package com.example.restaurant.servicio;
 
+import com.example.restaurant.dto.PedidoRequest;
 import com.example.restaurant.entidades.*;
-import com.example.restaurant.modelo.Item;
-import com.example.restaurant.modelo.PedidoSession;
 import com.example.restaurant.repositorios.*;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepo;
+    private final PedidoRepository pedidoRepository;
+    private final ClienteRepository clienteRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ComidaRepository comidaRepository;
+    private final BebidaRepository bebidaRepository;
 
-    @Autowired
-    private DetallePedidoRepository detallePedidoRepo;
-
-    @Autowired
-    private ComidaRepository comidaRepo;
-
-    @Autowired
-    private BebidaRepository bebidaRepo;
-
-    @Autowired
-    private UsuarioRepository usuarioRepo;
-
-    @Autowired
-    private ClienteRepository clienteRepo;
-    
-    @Autowired
-    private PedidoSession pedidoSession;
-
-    // Mock temporal (usuario y cliente por defecto)
-    private static final int ID_USUARIO_DEFAULT = 1;
-    private static final int ID_CLIENTE_DEFAULT = 1;
-
-    private final List<Item> pedidoTemporal = new ArrayList<>();
+    public PedidoService(PedidoRepository pedidoRepository,
+                         ClienteRepository clienteRepository,
+                         UsuarioRepository usuarioRepository,
+                         ComidaRepository comidaRepository,
+                         BebidaRepository bebidaRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.clienteRepository = clienteRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.comidaRepository = comidaRepository;
+        this.bebidaRepository = bebidaRepository;
+    }
 
     @Transactional
-    public void agregarItem(Item item) {
-        // Buscar en BD si es Comida o Bebida
-        if (item.getCategoria().equals("COMIDA")) {
-            Comida comida = comidaRepo.findByNombreComida(item.getNombre());
-            if (comida != null) {
-                item.setPrecioUnitario(comida.getPrecio());
-            }
-        } else if (item.getCategoria().equals("BEBIDA")) {
-            Bebida bebida = bebidaRepo.findByNombreBebida(item.getNombre());
-            if (bebida != null) {
-                item.setPrecioUnitario(bebida.getPrecio());
+    public Pedido crearPedidoCompleto(PedidoRequest request) {
+        // 1. Validar y obtener las entidades principales
+        Cliente cliente = clienteRepository.findById(request.getClienteId())
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + request.getClienteId()));
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioId()));
+
+        // 2. Crear la cabecera del pedido
+        Pedido nuevoPedido = new Pedido();
+        nuevoPedido.setCliente(cliente);
+        nuevoPedido.setUsuario(usuario);
+        nuevoPedido.setFecha(LocalDateTime.now());
+        nuevoPedido.setEstado("PENDIENTE");
+
+        // 3. Procesar y crear los detalles del pedido
+        List<DetallePedido> detalles = new ArrayList<>();
+        BigDecimal totalCalculado = BigDecimal.ZERO;
+
+        // Procesar detalles de comida
+        if (request.getDetallesComida() != null) {
+            for (PedidoRequest.DetalleComidaRequest detReq : request.getDetallesComida()) {
+                Comida comida = comidaRepository.findById(detReq.getComidaId())
+                        .orElseThrow(() -> new IllegalArgumentException("Comida no encontrada con ID: " + detReq.getComidaId()));
+
+                DetallePedido detalle = new DetallePedido();
+                detalle.setPedido(nuevoPedido);
+                detalle.setTipoItem(TipoItem.COMIDA);
+                detalle.setComida(comida);
+                detalle.setCantidad(detReq.getCantidad());
+                detalle.setPrecioUnitario(comida.getPrecio());
+                BigDecimal subtotal = comida.getPrecio().multiply(new BigDecimal(detReq.getCantidad()));
+                detalle.setSubtotal(subtotal);
+
+                detalles.add(detalle);
+                totalCalculado = totalCalculado.add(subtotal);
             }
         }
 
-        pedidoTemporal.add(item);
-    }
+        // Procesar detalles de bebida
+        if (request.getDetallesBebida() != null) {
+            for (PedidoRequest.DetalleBebidaRequest detReq : request.getDetallesBebida()) {
+                Bebida bebida = bebidaRepository.findById(detReq.getBebidaId())
+                        .orElseThrow(() -> new IllegalArgumentException("Bebida no encontrada con ID: " + detReq.getBebidaId()));
 
-    /* OLD CODE:
-    @Transactional
-    public void guardarPedidoEnBD() {
-        // Obtener usuario y cliente mock
-        Usuario usuario = usuarioRepo.findById(ID_USUARIO_DEFAULT).orElseThrow();
-        Cliente cliente = clienteRepo.findById(ID_CLIENTE_DEFAULT).orElseThrow();
-
-        // Crear pedido
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
-        pedido.setCliente(cliente);
-        pedido.setTotal(0.0);         // previously `pedido.setTotal(BigDecimal.ZERO);`
-        pedidoRepo.save(pedido);
-
-        // Guardar detalles
-        for (Item item : pedidoTemporal) {
-            DetallePedido detalle = new DetallePedido();
-            detalle.setPedido(pedido);
-            detalle.setCantidad(item.getCantidad());
-            detalle.setPrecioUnitario(item.getPrecioUnitario());
-            detalle.setSubtotal(item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad())));
-            detalle.setTipoItem(TipoItem.valueOf(item.getCategoria()));
-
-            if (item.getCategoria().equals("COMIDA")) {
-                Comida comida = comidaRepo.findByNombreComida(item.getNombre());
-                detalle.setComida(comida);
-            } else {
-                Bebida bebida = bebidaRepo.findByNombreBebida(item.getNombre());
-                detalle.setBebida(bebida);
-            }
-
-            detallePedidoRepo.save(detalle);
-            double newTotal = pedido.getTotal() + detalle.getSubtotal().doubleValue(); // new line added
-            pedido.setTotal(newTotal); // previously `pedido.setTotal(pedido.getTotal().add(detalle.getSubtotal()));`
-        }
-
-        pedidoRepo.save(pedido);
-        pedidoTemporal.clear();
-    }
-     * */
-    @Transactional
-    public void guardarPedidoEnBD(int usuarioId, int clienteId) {
-        // Obtener usuario y cliente de la base de datos
-    	Usuario usuario = usuarioRepo.findById(usuarioId).orElseThrow();
-        Cliente cliente = clienteRepo.findById(clienteId).orElseThrow();
-
-        // Crear pedido
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
-        pedido.setCliente(cliente);
-        pedido.setTotal(BigDecimal.ZERO.doubleValue());		// Set initial 'total' to BigDecimal.ZERO
-        pedidoRepo.save(pedido);
-        
-        pedido.setTotal(0.0);
-
-        BigDecimal total = BigDecimal.ZERO;
-		// Guardar detalles
-        for (Item item : pedidoSession.getItems()) {
-        	DetallePedido detalle = new DetallePedido();
-            detalle.setPedido(pedido);
-            detalle.setCantidad(item.getCantidad());
-            detalle.setPrecioUnitario(item.getPrecioUnitario());
-            
-            BigDecimal subtotal = item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad()));
-            detalle.setSubtotal(subtotal);
-            total = total.add(subtotal);
-            
-            if (item.getCategoria().equals("COMIDA")) {
-                Comida comida = comidaRepo.findByNombreComida(item.getNombre());
-                detalle.setComida(comida);
-                detalle.setTipoItem(comida.getTipoComida() == TipoComida.entrada ? TipoItem.ENTRADA : TipoItem.COMIDA);
-            } else {
-                Bebida bebida = bebidaRepo.findByNombreBebida(item.getNombre());
-                detalle.setBebida(bebida);
+                DetallePedido detalle = new DetallePedido();
+                detalle.setPedido(nuevoPedido);
                 detalle.setTipoItem(TipoItem.BEBIDA);
+                detalle.setBebida(bebida);
+                detalle.setCantidad(detReq.getCantidad());
+                detalle.setPrecioUnitario(bebida.getPrecio());
+                BigDecimal subtotal = bebida.getPrecio().multiply(new BigDecimal(detReq.getCantidad()));
+                detalle.setSubtotal(subtotal);
+
+                detalles.add(detalle);
+                totalCalculado = totalCalculado.add(subtotal);
             }
-            detallePedidoRepo.save(detalle);
-        	
         }
-        double newTotal = total.doubleValue();  // Convert BigDecimal to double
-        pedido.setTotal(total.doubleValue());       //intended original way ->   pedido.setTotal(total);
-        pedidoRepo.save(pedido);
-        pedidoSession.clear();
-    }
-    
 
-    public List<Item> obtenerPedido() {
-        return pedidoTemporal;
+        // 4. Asignar el total y los detalles al pedido
+        nuevoPedido.setTotal(totalCalculado);
+        nuevoPedido.setDetalles(detalles);
+
+        // 5. Guardar el pedido. Gracias a CascadeType.ALL, los detalles se guardan automáticamente.
+        return pedidoRepository.save(nuevoPedido);
     }
 
-    public void limpiarPedido() {
-        pedidoTemporal.clear();
+    // ==================== MÉTODO AÑADIDO ====================
+    /**
+     * Busca un pedido por su ID.
+     * @param id El ID del pedido.
+     * @return La entidad Pedido completa con sus detalles.
+     * @throws IllegalArgumentException si el pedido no se encuentra.
+     */
+    public Pedido obtenerPedidoPorId(Integer id) {
+        // Usamos findById que devuelve un Optional y lanzamos una excepción si está vacío.
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + id));
     }
+    // ========================================================
 }

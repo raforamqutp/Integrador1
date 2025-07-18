@@ -24,7 +24,7 @@ public class ClienteService {
         Cliente cliente = new Cliente();
         cliente.setNombreCliente(nombre);
         cliente.setTipoCliente(tipo);
-        return clienteRepository.save(cliente); // Suponiendo que tienes un JPA Repository
+        return clienteRepository.save(cliente);
     }
     
     /**
@@ -98,8 +98,9 @@ public class ClienteService {
     public List<Cliente> buscarClientesPorNombre(String nombre) {
         return clienteRepository.findByNombreClienteContainingIgnoreCase(nombre);
     }
+    
     /**
-     * Obtiene estadísticas básicas
+     * Obtiene estadísticas básicas - ACTUALIZADO SIN EMPRESA
      */
     public String obtenerEstadisticas() {
         List<Cliente> todos = clienteRepository.findAll();
@@ -108,19 +109,66 @@ public class ClienteService {
                 .filter(c -> c.getTipoCliente() == TipoCliente.PENSION)
                 .count();
         
-        long empresas = todos.stream()
-                .filter(c -> c.getTipoCliente() == TipoCliente.EMPRESA)
-                .count();
-        
         long particulares = todos.stream()
                 .filter(c -> c.getTipoCliente() == TipoCliente.PARTICULAR)
                 .count();
         
-        return String.format("Total: %d | Pensionados: %d | Empresas: %d | Particulares: %d",
-                todos.size(), pensionados, empresas, particulares);
+        return String.format("Total: %d | Pensionados: %d | Particulares: %d",
+                todos.size(), pensionados, particulares);
     }
+    
+    /**
+     * Guarda un cliente (usado por el controlador)
+     */
     public void guardarCliente(Cliente cliente) {
         clienteRepository.save(cliente);
     }
-
+    
+    /**
+     * Busca clientes pensionados por nombre o DNI
+     */
+    public List<Cliente> buscarClientesPensionados(String termino) {
+        if (termino == null || termino.trim().isEmpty()) {
+            return clienteRepository.findByTipoCliente(TipoCliente.PENSION);
+        }
+        
+        // Si existe el método en el repository, usarlo
+        try {
+            return clienteRepository.buscarPensionadosPorNombreODni(termino);
+        } catch (Exception e) {
+            // Si no existe el método, usar búsqueda básica
+            return clienteRepository.findByTipoCliente(TipoCliente.PENSION);
+        }
+    }
+    
+    /**
+     * Busca por término general (nombre, DNI, etc.)
+     */
+    public List<Cliente> buscarPorTerminoGeneral(String termino) {
+        if (termino == null || termino.trim().isEmpty()) {
+            return listarClientes();
+        }
+        
+        // Si existe el método en el repository, usarlo
+        try {
+            return clienteRepository.buscarPorTerminoGeneral(termino);
+        } catch (Exception e) {
+            // Si no existe el método, usar búsqueda básica por nombre
+            return clienteRepository.findByNombreClienteContainingIgnoreCase(termino);
+        }
+    }
+    
+    /**
+     * Valida los datos de un cliente antes de guardar
+     */
+    public boolean validarCliente(Cliente cliente) {
+        if (cliente.getTipoCliente() == TipoCliente.PENSION) {
+            return cliente.getDni() != null && !cliente.getDni().isEmpty() &&
+                   cliente.getNombres() != null && !cliente.getNombres().isEmpty() &&
+                   cliente.getApellidos() != null && !cliente.getApellidos().isEmpty();
+        } else if (cliente.getTipoCliente() == TipoCliente.PARTICULAR) {
+            return cliente.getNombreCliente() != null && !cliente.getNombreCliente().isEmpty();
+        }
+        return false;
+    }
 }

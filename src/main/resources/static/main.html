@@ -9,29 +9,35 @@
 </head>
 <body>
 
-  <div class="container-panel">
-    <!-- Panel izquierdo -->
-    <div class="panel">
-      <button id="botonmenu" class="btn btn-custom">Menú</button>
-      <button id="botonhistoria"class="btn btn-custom">Compras</button>
-      <button id="botonClientes" class="btn btn-custom">Clientes</button>
+<div class="container-panel">
+  <!-- Panel izquierdo -->
+  <div class="panel">
+    <button id="botonmenu" class="btn btn-custom">Menú</button>
+    <button id="botonInventario"class="btn btn-custom">Inventario</button>
+    <button id="botonClientes" class="btn btn-custom">Clientes</button>
+    <!-- ==================== INICIO DEL CAMBIO ==================== -->
+    <button id="botonHistorial" class="btn btn-custom">Historial de Pedidos</button>
+    <!-- ===================== FIN DEL CAMBIO ====================== -->
 
-      <div class="footer-buttons mt-auto">
-        <button class="btn btn-support">Soporte</button>
-        <button id="botonCerrar" class="btn btn-logout">Cerrar sesión</button>
-      </div>
+    <div class="footer-buttons mt-auto">
+      <button class="btn btn-support">Soporte</button>
+      <button id="botonCerrar" class="btn btn-logout">Cerrar sesión</button>
     </div>
-
-    <!-- Logo a la derecha -->
-    <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
   </div>
+
+  <!-- Logo a la derecha -->
+  <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
+</div>
 <script>
   const botonCerrar = document.getElementById('botonCerrar');
   const botonmenu = document.getElementById('botonmenu');
-  const botonhistoria = document.getElementById('botonhistoria');
+  const botonInventario = document.getElementById('botonInventario');
   const botonClientes = document.getElementById('botonClientes');
+  const botonHistorial = document.getElementById('botonHistorial');
 
   botonCerrar.addEventListener('click', function() {
+    sessionStorage.clear();
+    localStorage.clear();
     window.location.href = 'login.html';
   });
 
@@ -39,14 +45,21 @@
     window.location.href = 'platos.html';
   });
 
-  botonhistoria.addEventListener('click', function() {
-    window.location.href = 'inventario';
+  // ==================== INICIO DE LA CORRECCIÓN ====================
+  // Ahora apunta a la ruta del controlador, no al archivo directamente.
+  botonInventario.addEventListener('click', function() {
+    window.location.href = '/inventario';
   });
+  // ===================== FIN DE LA CORRECCIÓN ======================
 
   botonClientes.addEventListener('click', function() {
     window.location.href = 'gestion-clientes.html';
   });
-	</script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
+  botonHistorial.addEventListener('click', function() {
+    window.location.href = 'historial.html';
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 </html>

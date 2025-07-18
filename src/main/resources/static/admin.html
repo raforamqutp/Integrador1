@@ -6,51 +6,62 @@
   <link rel="stylesheet" href="CSS/adminstyle.css">
 </head>
 <body>
-  <div class="container-panel">
-    <!-- Panel izquierdo -->
-    <div class="panel">
-      <button id="botontareas" class="btn btn-custom">Tareas</button>
-      <button id="botonRegInc" class="btn btn-custom">Registrar Incidencia</button>
-      <button id="botonLibroRecl"class="btn btn-custom">Libro de Reclamaciones</button>
-      <button id="botonMenu" class="btn btn-custom">Gestión de Menú</button>
+<div class="container-panel">
+  <!-- Panel izquierdo -->
+  <div class="panel">
+    <button id="botontareas" class="btn btn-custom">Tareas</button>
+    <button id="botonRegInc" class="btn btn-custom">Registrar Incidencia</button>
+    <button id="botonLibroRecl"class="btn btn-custom">Empleado Nuevo</button>
+    <button id="botonMenu" class="btn btn-custom">Gestión de Menú</button>
+    <!-- ==================== INICIO DEL CAMBIO ==================== -->
+    <button id="botonGestionInsumos" class="btn btn-custom">Gestión de Insumos</button>
+    <!-- ===================== FIN DEL CAMBIO ====================== -->
 
-      <div class="footer-buttons">
-        <button class="btn btn-support">Soporte</button>
-        <button class="btn btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
-      </div>
+    <div class="footer-buttons">
+      <button class="btn btn-support">Soporte</button>
+      <button class="btn btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
-
-    <!-- Logo -->
-    <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
   </div>
 
-  <script>
+  <!-- Logo -->
+  <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
+</div>
 
-	const botontareas = document.getElementById('botontareas');
+<script>
+  const botontareas = document.getElementById('botontareas');
+  botontareas.addEventListener('click', function() {
+      window.location.href = 'Tareas.html';
+  });
 
-	botontareas .addEventListener('click', function() {
-		window.location.href = 'Tareas.html';
-	});
-	const botonRegInc = document.getElementById('botonRegInc');
+  const botonRegInc = document.getElementById('botonRegInc');
+  botonRegInc.addEventListener('click', function() {
+      window.location.href = 'formulario.html';
+  });
 
-	botonRegInc.addEventListener('click', function() {
-		window.location.href = 'formulario.html';
-	});
-    const botonLibroRecl = document.getElementById('botonLibroRecl');
+  const botonLibroRecl = document.getElementById('botonLibroRecl');
+  botonLibroRecl.addEventListener('click', function() {
+      window.location.href = 'registro-empleado.html';
+  });
 
-    botonLibroRecl.addEventListener('click', function() {
-		window.location.href = 'listar.html';
-	});
+  const botonMenu = document.getElementById('botonMenu');
+  botonMenu.addEventListener('click', function() {
+      window.location.href = '/menu-crud';
+  });
 
-    const botonMenu = document.getElementById('botonMenu');
-    botonMenu.addEventListener('click', function() {
-    	window.location.href = '/menu-crud';
-    });
+  // ==================== INICIO DEL CAMBIO ====================
+  const botonGestionInsumos = document.getElementById('botonGestionInsumos');
+  botonGestionInsumos.addEventListener('click', function() {
+      // Apunta a la ruta del controlador que renderiza compras.html
+      window.location.href = '/compras';
+  });
+  // ===================== FIN DEL CAMBIO ======================
 
-	function cerrarSesion() {
-      window.location.href = 'login.html';
-    }
-  
-  </script>
+  function cerrarSesion() {
+    // Limpia la sesión del navegador antes de redirigir
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+</script>
 </body>
 </html>
