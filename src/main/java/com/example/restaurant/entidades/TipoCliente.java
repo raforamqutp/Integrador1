@@ -1,8 +1,5 @@
 package com.example.restaurant.entidades;
-
 public enum TipoCliente {
-	
-    PARTICULAR,
-    PENSION,
-    EMPRESA
+    PARTICULAR,  // Cliente normal individual
+    PENSION      // Cliente pensionado (empleado)
 }
