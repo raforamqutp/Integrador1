@@ -22,6 +22,9 @@ public class Bebida {
     @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
+	@Column(name = "imagen", nullable = true)
+	private String imagen;
+
 	public Integer getIdBebida() {
 		return idBebida;
 	}
@@ -54,5 +57,6 @@ public class Bebida {
         this.precio = precio;
     }
 
-    
-}
+	public void setImagen(String imagen) {imagen = imagen;}
+
+	public String getImagen() {return imagen;}}

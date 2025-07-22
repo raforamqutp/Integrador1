@@ -6,6 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="CSS/mainstyle.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* ✅ Estilo para el nuevo contenedor del logo y el estado */
+    .logo-and-status-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Estilos para el indicador de caja */
+    .caja-status {
+      padding: 5px 15px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-top: 15px; /* Espacio entre el logo y el indicador */
+    }
+    .caja-abierta { background-color: #dc3545; } /* Rojo */
+    .caja-cerrada { background-color: #198754; } /* Verde */
+    .caja-error { background-color: #ffc107; color: #333; } /* Amarillo para error */
+  </style>
 </head>
 <body>
 
@@ -15,20 +39,59 @@
     <button id="botonmenu" class="btn btn-custom">Menú</button>
     <button id="botonInventario"class="btn btn-custom">Inventario</button>
     <button id="botonClientes" class="btn btn-custom">Clientes</button>
-    <!-- ==================== INICIO DEL CAMBIO ==================== -->
     <button id="botonHistorial" class="btn btn-custom">Historial de Pedidos</button>
-    <!-- ===================== FIN DEL CAMBIO ====================== -->
 
     <div class="footer-buttons mt-auto">
-      <button class="btn btn-support">Soporte</button>
+      <!-- ✅ BOTÓN MODIFICADO CON CONFIRMACIÓN -->
+      <button class="btn btn-support" onclick="confirmarSoporte()">Soporte</button>
       <button id="botonCerrar" class="btn btn-logout">Cerrar sesión</button>
     </div>
   </div>
 
-  <!-- Logo a la derecha -->
-  <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
+  <!-- ✅ Contenedor para el logo y el estado -->
+  <div class="logo-and-status-wrapper">
+    <img src="img/placeholder.png" alt="Logo El sabor de Marcona" class="logo">
+    <div id="cajaStatusIndicator"></div>
+  </div>
 </div>
 <script>
+  // La lógica de JavaScript no necesita cambios
+  async function mostrarEstadoCaja() {
+    const indicatorDiv = document.getElementById('cajaStatusIndicator');
+    try {
+      const response = await fetch('/api/caja/estado');
+      if (!response.ok) {
+          throw new Error('Respuesta no válida del servidor');
+      }
+      const data = await response.json();
+      if (data.estado === 'abierta') {
+        indicatorDiv.innerHTML = '<span class="caja-status caja-abierta">Caja Abierta</span>';
+      } else {
+        indicatorDiv.innerHTML = '<span class="caja-status caja-cerrada">Caja Cerrada</span>';
+      }
+    } catch (error) {
+      indicatorDiv.innerHTML = '<span class="caja-status caja-error">Error</span>';
+      console.error('Error al obtener estado de la caja:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    mostrarEstadoCaja();
+  });
+
+  // ✅ NUEVA FUNCIÓN PARA CONFIRMAR SOPORTE
+  function confirmarSoporte() {
+    const mensaje = "Será redirigido a una página externa (WhatsApp) para contactar a soporte. ¿Desea continuar?";
+    if (confirm(mensaje)) {
+        // Puedes personalizar el número y el mensaje aquí
+        const numero = "51979674386";
+        const texto = "Hola, necesito soporte técnico para el sistema de restaurante. Mi problema es:";
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+        window.open(url, '_blank');
+    }
+  }
+
+  // El resto del script se mantiene igual
   const botonCerrar = document.getElementById('botonCerrar');
   const botonmenu = document.getElementById('botonmenu');
   const botonInventario = document.getElementById('botonInventario');
@@ -42,15 +105,12 @@
   });
 
   botonmenu.addEventListener('click', function() {
-    window.location.href = 'platos.html';
+    window.location.href = 'platos';
   });
 
-  // ==================== INICIO DE LA CORRECCIÓN ====================
-  // Ahora apunta a la ruta del controlador, no al archivo directamente.
   botonInventario.addEventListener('click', function() {
     window.location.href = '/inventario';
   });
-  // ===================== FIN DE LA CORRECCIÓN ======================
 
   botonClientes.addEventListener('click', function() {
     window.location.href = 'gestion-clientes.html';

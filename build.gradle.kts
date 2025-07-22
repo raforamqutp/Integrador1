@@ -31,6 +31,11 @@ dependencies {
 	// --- DEPENDENCIA AÑADIDA PARA GENERAR PDFS ---
 	implementation("com.itextpdf:itext7-core:8.0.4")
 
+	// ✅ INICIO: DEPENDENCIAS DE LOMBOK AÑADIDAS
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+	// ✅ FIN: DEPENDENCIAS DE LOMBOK AÑADIDAS
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

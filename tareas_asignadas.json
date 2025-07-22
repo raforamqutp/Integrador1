@@ -1,0 +1,34 @@
+  [ {
+    "id" : 1753164349414,
+    "worker" : {
+      "name" : "admin",
+      "role" : "ADMIN"
+    },
+    "title" : "SI",
+    "description" : "SI PRUEBA ACTUAL",
+    "type" : "inventario",
+    "dueTime" : "2025-08-09T01:05",
+    "priority" : "Media",
+    "status" : "Pendiente"
+  }, {
+    "worker" : {
+      "name" : "conde",
+      "role" : "USER"
+    },
+    "title" : "TAREA DE PRUEBA",
+    "type" : "preparacion_cocina",
+    "dueTime" : "2025-07-26T19:26",
+    "priority" : "Media",
+    "description" : "Una prueba muy silly uwu"
+  }, {
+    "worker" : {
+      "name" : "admin",
+      "role" : "ADMIN"
+    },
+    "title" : "TAREA2",
+    "type" : "atencion_cliente",
+    "dueTime" : "2025-06-20T13:56",
+    "priority" : "Baja",
+    "description" : "Descripcion"
+  }
+]

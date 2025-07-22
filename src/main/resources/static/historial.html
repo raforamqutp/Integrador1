@@ -12,7 +12,7 @@
         --light-color: #f8f9fa;
     }
     body {
-        background-color: #ecf0f1;
+        background: linear-gradient(to left, #e0e0e0, #1b6b57);
         font-family: 'Segoe UI', sans-serif;
     }
     .navbar { background-color: var(--primary-color); }
@@ -24,17 +24,25 @@
 </head>
 <body>
 
-<!-- ==================== INICIO DEL CAMBIO ==================== -->
 <a href="main.html" class="back-button" title="Volver al Panel Principal"><i class="fas fa-arrow-left"></i></a>
-<!-- ===================== FIN DEL CAMBIO ====================== -->
-
 
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-history me-2"></i>Historial de Ventas</h2>
-    <button class="btn btn-success" id="btnDescargarReporte">
-      <i class="fas fa-file-excel me-2"></i>Descargar Reporte
-    </button>
+    <div>
+      <!-- ✅ BOTÓN DE CERRAR CAJA AÑADIDO -->
+      <button class="btn btn-danger" id="btnCerrarCaja">
+        <i class="fas fa-archive me-2"></i>Cerrar Caja
+      </button>
+      <button class="btn btn-success" id="btnDescargarReporte">
+        <i class="fas fa-file-excel me-2"></i>Descargar Reporte
+      </button>
+    </div>
+  </div>
+
+  <!-- ✅ BARRA DE BÚSQUEDA AÑADIDA -->
+  <div class="mb-3">
+    <input type="text" id="historialSearchInput" class="form-control" placeholder="Buscar por ID de pedido, cliente o empleado...">
   </div>
 
   <div class="table-responsive">
@@ -91,8 +99,42 @@
       loadHistorial();
 
       document.getElementById('btnDescargarReporte').addEventListener('click', () => {
-          // CORRECCIÓN: Apunta al nuevo controlador de reportes
           window.location.href = '/api/reportes/historial/excel';
+      });
+
+      // ✅ EVENT LISTENER PARA LA BARRA DE BÚSQUEDA
+      document.getElementById('historialSearchInput').addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          const filteredPedidos = historialPedidos.filter(p =>
+              p.idPedido.toString().includes(searchTerm) ||
+              p.nombreCliente.toLowerCase().includes(searchTerm) ||
+              p.nombreUsuario.toLowerCase().includes(searchTerm)
+          );
+          renderHistorial(filteredPedidos); // Renderiza solo los pedidos filtrados
+      });
+
+      // ✅ EVENT LISTENER PARA EL BOTÓN DE CERRAR CAJA
+      document.getElementById('btnCerrarCaja').addEventListener('click', async () => {
+          const confirmation = confirm('¡ADVERTENCIA! Esta acción es irreversible.\n\nSe archivarán todos los pedidos y se limpiará el historial de ventas actual. ¿Desea continuar?');
+          if (confirmation) {
+              const btn = document.getElementById('btnCerrarCaja');
+              btn.disabled = true;
+              btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cerrando...';
+              try {
+                  const response = await fetch('/api/caja/cerrar', { method: 'POST' });
+                  const result = await response.json();
+                  if (!response.ok) {
+                      throw new Error(result.message || 'Error desconocido del servidor.');
+                  }
+                  alert(result.message);
+                  loadHistorial(); // Recarga el historial para mostrar la tabla vacía
+              } catch (error) {
+                  alert('Error al cerrar la caja: ' + error.message);
+              } finally {
+                  btn.disabled = false;
+                  btn.innerHTML = '<i class="fas fa-archive me-2"></i>Cerrar Caja';
+              }
+          }
       });
   });
 
@@ -103,25 +145,25 @@
           const response = await fetch('/api/pedidos/historial');
           if (!response.ok) throw new Error('Error al cargar el historial.');
 
-          historialPedidos = await response.json();
-          renderHistorial();
+          historialPedidos = await response.json(); // Guarda la lista completa
+          renderHistorial(historialPedidos); // Renderiza la lista completa
       } catch (error) {
           tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
       }
   }
 
-  function renderHistorial() {
+  // ✅ FUNCIÓN MODIFICADA para aceptar una lista de pedidos a mostrar
+  function renderHistorial(pedidosToShow) {
       const tbody = document.getElementById('historialTableBody');
       tbody.innerHTML = '';
 
-      if (historialPedidos.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pedidos en el historial.</td></tr>';
+      if (pedidosToShow.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center">No se encontraron pedidos.</td></tr>';
           return;
       }
 
-      historialPedidos.forEach(pedido => {
+      pedidosToShow.forEach(pedido => {
           const row = document.createElement('tr');
-          // CORRECCIÓN: Se usa 'pedido.fecha' que viene del DTO, en lugar de 'pedido.fechaPedido'.
           row.innerHTML = `
               <td>#${pedido.idPedido}</td>
               <td>${pedido.fecha}</td>

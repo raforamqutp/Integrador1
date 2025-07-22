@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "cliente")
 public class Cliente {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_Cliente")
@@ -28,7 +28,7 @@ public class Cliente {
     @Column(name = "Nombres", length = 100)
     private String nombres;
 
-    @Column(name = "Apellidos", length = 100) 
+    @Column(name = "Apellidos", length = 100)
     private String apellidos;
 
     // ✅ RELACIONES CON @JsonIgnore PARA EVITAR CICLOS
@@ -82,9 +82,9 @@ public class Cliente {
     public boolean esValido() {
         switch (tipoCliente) {
             case PENSION:
-                return dni != null && !dni.isEmpty() && 
-                       nombres != null && !nombres.isEmpty() && 
-                       apellidos != null && !apellidos.isEmpty();
+                return dni != null && !dni.isEmpty() &&
+                        nombres != null && !nombres.isEmpty() &&
+                        apellidos != null && !apellidos.isEmpty();
             case PARTICULAR:
                 return nombreCliente != null && !nombreCliente.isEmpty();
             default:
@@ -163,7 +163,7 @@ public class Cliente {
         StringBuilder sb = new StringBuilder("Cliente{");
         sb.append("idCliente=").append(idCliente);
         sb.append(", tipoCliente=").append(tipoCliente);
-        
+
         if (tipoCliente == TipoCliente.PENSION) {
             sb.append(", dni='").append(dni).append('\'');
             sb.append(", nombres='").append(nombres).append('\'');
@@ -171,11 +171,11 @@ public class Cliente {
         } else if (tipoCliente == TipoCliente.PARTICULAR) {
             sb.append(", nombreCliente='").append(nombreCliente).append('\'');
         }
-        
+
         sb.append(", pensiones=").append(pensiones != null ? pensiones.size() : 0);
         sb.append(", pedidos=").append(pedidos != null ? pedidos.size() : 0);
         sb.append('}');
-        
+
         return sb.toString();
     }
 

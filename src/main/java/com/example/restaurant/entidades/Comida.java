@@ -22,6 +22,9 @@ public class Comida {
     @Column(name = "precio", nullable = false, columnDefinition = "DECIMAL(10,2)")
     private BigDecimal precio;
 
+	@Column(name = "imagen", nullable = true) // nullable = true permite que haya platos sin imagen
+	private String imagen;
+
 	public Integer getIdComida() {
 		return idComida;
 	}
@@ -54,6 +57,6 @@ public class Comida {
 		this.precio = precio;
 	}
 
+	public String getImagen() {return imagen;}
 
-    
-}
+	public void setImagen(String imagen) {this.imagen = imagen;}}

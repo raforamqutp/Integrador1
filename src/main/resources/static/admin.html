@@ -4,6 +4,38 @@
   <meta charset="UTF-8">
   <title>Menú Admin</title>
   <link rel="stylesheet" href="CSS/adminstyle.css">
+  <style>
+    /* ✅ Estilo para el nuevo contenedor del logo y el estado */
+    .logo-and-status-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Estilos para el indicador de caja */
+    .caja-status {
+      position: relative;
+      padding: 5px 15px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-top: 15px; /* Espacio entre el logo y el indicador */
+      margin-left: 30px;
+    }
+    .caja-abierta { background-color: #dc3545; } /* Rojo */
+    .caja-cerrada { background-color: #198754; } /* Verde */
+    .caja-error { background-color: #ffc107; color: #333; } /* Amarillo para error */
+
+    #cajaStatusIndicator {
+      text-align: center;
+      width: 100%;
+    }
+
+  </style>
 </head>
 <body>
 <div class="container-panel">
@@ -13,51 +45,80 @@
     <button id="botonRegInc" class="btn btn-custom">Registrar Incidencia</button>
     <button id="botonLibroRecl"class="btn btn-custom">Empleado Nuevo</button>
     <button id="botonMenu" class="btn btn-custom">Gestión de Menú</button>
-    <!-- ==================== INICIO DEL CAMBIO ==================== -->
     <button id="botonGestionInsumos" class="btn btn-custom">Gestión de Insumos</button>
-    <!-- ===================== FIN DEL CAMBIO ====================== -->
 
     <div class="footer-buttons">
-      <button class="btn btn-support">Soporte</button>
+      <!-- ✅ BOTÓN MODIFICADO CON CONFIRMACIÓN -->
+      <button class="btn btn-support" onclick="confirmarSoporte()">Soporte</button>
       <button class="btn btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
   </div>
 
-  <!-- Logo -->
-  <img src="img/logorestaurant.jpeg" alt="Logo El sabor de Marcona" class="logo">
+  <!-- ✅ Contenedor para el logo y el estado -->
+  <div class="logo-and-status-wrapper">
+    <img src="img/placeholder.png" alt="Logo El sabor de Marcona" class="logo">
+    <div id="cajaStatusIndicator"></div>
+  </div>
 </div>
 
 <script>
+  // La lógica de JavaScript no necesita cambios
+  async function mostrarEstadoCaja() {
+    const indicatorDiv = document.getElementById('cajaStatusIndicator');
+    try {
+      const response = await fetch('/api/caja/estado');
+      if (!response.ok) {
+          throw new Error('Respuesta no válida del servidor');
+      }
+      const data = await response.json();
+      if (data.estado === 'abierta') {
+        indicatorDiv.innerHTML = '<span class="caja-status caja-abierta">Caja Abierta</span>';
+      } else {
+        indicatorDiv.innerHTML = '<span class="caja-status caja-cerrada">Caja Cerrada</span>';
+      }
+    } catch (error) {
+      indicatorDiv.innerHTML = '<span class="caja-status caja-error">Error</span>';
+      console.error('Error al obtener estado de la caja:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    mostrarEstadoCaja();
+  });
+
+  // ✅ NUEVA FUNCIÓN PARA CONFIRMAR SOPORTE
+  function confirmarSoporte() {
+    const mensaje = "Será redirigido a una página externa (WhatsApp) para contactar a soporte. ¿Desea continuar?";
+    if (confirm(mensaje)) {
+        const numero = "51979674386";
+        const texto = "Hola, necesito soporte técnico para el sistema de restaurante. Mi problema es:";
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+        window.open(url, '_blank');
+    }
+  }
+
+  // El resto del script se mantiene igual
   const botontareas = document.getElementById('botontareas');
   botontareas.addEventListener('click', function() {
       window.location.href = 'Tareas.html';
   });
-
   const botonRegInc = document.getElementById('botonRegInc');
   botonRegInc.addEventListener('click', function() {
       window.location.href = 'formulario.html';
   });
-
   const botonLibroRecl = document.getElementById('botonLibroRecl');
   botonLibroRecl.addEventListener('click', function() {
       window.location.href = 'registro-empleado.html';
   });
-
   const botonMenu = document.getElementById('botonMenu');
   botonMenu.addEventListener('click', function() {
       window.location.href = '/menu-crud';
   });
-
-  // ==================== INICIO DEL CAMBIO ====================
   const botonGestionInsumos = document.getElementById('botonGestionInsumos');
   botonGestionInsumos.addEventListener('click', function() {
-      // Apunta a la ruta del controlador que renderiza compras.html
       window.location.href = '/compras';
   });
-  // ===================== FIN DEL CAMBIO ======================
-
   function cerrarSesion() {
-    // Limpia la sesión del navegador antes de redirigir
     sessionStorage.clear();
     localStorage.clear();
     window.location.href = 'login.html';

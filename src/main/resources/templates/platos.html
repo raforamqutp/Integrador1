@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<!-- Se añade el namespace de Thymeleaf -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú de Comidas y Bebidas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Se usan rutas de Thymeleaf para los CSS -->
+  <link rel="stylesheet" th:href="@{/css/platos.css}">
+  <style>
+    /* Tus estilos CSS se mantienen igual */
+    body {
+      background: linear-gradient(to left, #e0e0e0, #1b6b57);
+      min-height: 100vh;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      position: relative;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    .boton-volver { position: absolute; top: 20px; right: 20px; background-color: #e74c3c; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); text-decoration: none; }
+    .category-buttons { display: flex; justify-content: center; margin-bottom: 30px; gap: 15px; }
+    .category-btn { padding: 10px 25px; border-radius: 25px; border: none; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .category-btn.active { background-color: #2ecc71; color: white; transform: scale(1.05); }
+    .category-btn:not(.active) { background-color: #f8f9fa; color: #333; }
+    .card-menu { background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 20px; display: flex; align-items: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: transform 0.3s; }
+    .card-menu:hover { transform: translateY(-5px); }
+    .card-menu img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-right: 15px; }
+    .dish-name { font-weight: 600; font-size: 1.1rem; flex-grow: 1; }
+    .contador-container { display: flex; align-items: center; }
+    .contador { font-size: 1.1rem; font-weight: bold; margin: 0 15px; min-width: 30px; text-align: center; }
+    .btn-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding: 0; cursor: pointer; }
+    .boton-reporte { position: fixed; bottom: 30px; right: 30px; padding: 12px 25px; background-color: #2ecc71; color: white; border: none; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); transition: all 0.3s; }
+    .boton-reporte:hover { background-color: #27ae60; transform: scale(1.05); }
+    .hidden { display: none !important; }
+    .no-items { text-align: center; padding: 20px; color: #666; font-style: italic; }
+
+    /* ✅ NUEVO ESTILO PARA EL BOTÓN DE BORRADORES */
+    .boton-borradores {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        padding: 12px 25px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+    }
+    .boton-borradores:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+<a th:href="@{/main.html}" class="boton-volver">↩</a>
+
+<div class="container">
+  <div class="category-buttons">
+    <button class="category-btn" id="btn-entradas" onclick="mostrarCategoria('entradas')">Entradas</button>
+    <button class="category-btn active" id="btn-platos" onclick="mostrarCategoria('platos')">Platos</button>
+    <button class="category-btn" id="btn-bebidas" onclick="mostrarCategoria('bebidas')">Bebidas</button>
+  </div>
+
+
+<div class="container">
+  <!-- ... todo el contenido de las tarjetas de productos se mantiene igual ... -->
+  <!-- Contenedor para Entradas -->
+  <div id="seccion-entradas" class="hidden">
+    <div th:if="${entradas.empty}" class="no-items">No hay entradas registradas.</div>
+    <div th:each="item : ${entradas}" class="card-menu">
+      <img th:src="${item.imagen != null ? '/img/' + item.imagen : '/img/placeholder.png'}"
+           th:alt="${item.nombreComida}"
+           onerror="this.onerror=null;this.src='/img/placeholder.png';">
+      <div class="dish-name" th:text="${item.nombreComida}"></div>
+      <div class="contador-container">
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('entradas', 'comida', [[${item.nombreComida}]], -1, [[${item.idComida}]], [[${item.precio}]])">−</button>
+        <span th:id="'contador-entradas-' + ${item.idComida}" class="contador">0</span>
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('entradas', 'comida', [[${item.nombreComida}]], 1, [[${item.idComida}]], [[${item.precio}]])">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para Platos -->
+  <div id="seccion-platos">
+    <div th:if="${platos.empty}" class="no-items">No hay platos registrados.</div>
+    <div th:each="item : ${platos}" class="card-menu">
+      <img th:src="${item.imagen != null ? '/img/' + item.imagen : '/img/placeholder.png'}"
+           th:alt="${item.nombreComida}"
+           onerror="this.onerror=null;this.src='/img/placeholder.png';">
+      <div class="dish-name" th:text="${item.nombreComida}"></div>
+      <div class="contador-container">
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('platos', 'comida', [[${item.nombreComida}]], -1, [[${item.idComida}]], [[${item.precio}]])">−</button>
+        <span th:id="'contador-platos-' + ${item.idComida}" class="contador">0</span>
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('platos', 'comida', [[${item.nombreComida}]], 1, [[${item.idComida}]], [[${item.precio}]])">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para Bebidas -->
+  <div id="seccion-bebidas" class="hidden">
+    <div th:if="${bebidas.empty}" class="no-items">No hay bebidas registradas.</div>
+    <div th:each="item : ${bebidas}" class="card-menu">
+      <img th:src="${item.imagen != null ? '/img/' + item.imagen : '/img/placeholder.png'}"
+           th:alt="${item.nombreBebida}"
+           onerror="this.onerror=null;this.src='/img/placeholder.png';">
+      <div class="dish-name" th:text="${item.nombreBebida}"></div>
+      <div class="contador-container">
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('bebidas', 'bebida', [[${item.nombreBebida}]], -1, [[${item.idBebida}]], [[${item.precio}]])">−</button>
+        <span th:id="'contador-bebidas-' + ${item.idBebida}" class="contador">0</span>
+        <button class="btn btn-outline-dark btn-circle" th:onclick="modificarCantidad('bebidas', 'bebida', [[${item.nombreBebida}]], 1, [[${item.idBebida}]], [[${item.precio}]])">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ NUEVO BOTÓN PARA VER BORRADORES -->
+<button onclick="abrirModalBorradores()" class="boton-borradores hidden" id="btn-ver-borradores">
+  <i class="fas fa-history"></i> Ver Pedidos Guardados
+</button>
+
+<button onclick="verResumen()" class="boton-reporte hidden" id="btn-ver-resumen">
+  Ver Resumen
+</button>
+
+<!-- Modal para Gestión de Borradores (sin cambios) -->
+<div class="modal fade" id="gestionPedidoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="gestionPedidoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="gestionPedidoModalLabel">Pedidos Pendientes</h5>
+      </div>
+      <div class="modal-body">
+        <p>Hemos encontrado pedidos guardados sin finalizar. ¿Qué te gustaría hacer?</p>
+        <div id="listaBorradores" class="list-group">
+          <!-- Los borradores se cargarán aquí dinámicamente -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="crearNuevoPedido()">
+          <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script inline con la lógica corregida -->
+<script th:inline="javascript">
+  let pedido = { platos: {}, bebidas: {}, entradas: {} };
+  let gestionPedidoModal;
+
+  document.addEventListener("DOMContentLoaded", function() {
+      gestionPedidoModal = new bootstrap.Modal(document.getElementById('gestionPedidoModal'));
+
+      // ✅ CAMBIO PRINCIPAL: La lógica ya no se dispara automáticamente.
+      // Ahora solo revisa si debe mostrar el botón de "Ver Borradores".
+      const borradores = JSON.parse(localStorage.getItem("pedidosBorradores") || "[]");
+      const btnVerBorradores = document.getElementById('btn-ver-borradores');
+
+      if (borradores.length > 0) {
+          btnVerBorradores.classList.remove('hidden');
+      } else {
+          btnVerBorradores.classList.add('hidden');
+      }
+
+      // La carga del pedido actual se hace siempre, independientemente de los borradores.
+      cargarPedidoGuardado();
+      actualizarContadoresDesdePedido();
+      actualizarBotonResumen();
+  });
+
+  // ✅ NUEVA FUNCIÓN para abrir el modal manualmente
+  function abrirModalBorradores() {
+      const borradores = JSON.parse(localStorage.getItem("pedidosBorradores") || "[]");
+      if (borradores.length > 0) {
+          mostrarGestionDePedidos(borradores);
+      } else {
+          alert("No tienes pedidos guardados.");
+      }
+  }
+
+  // ==================== FUNCIONES PARA BORRADORES (La mayoría sin cambios) ====================
+  function mostrarGestionDePedidos(borradores) {
+      const listaContainer = document.getElementById('listaBorradores');
+      listaContainer.innerHTML = '';
+
+      borradores.forEach(borrador => {
+          const itemCount = Object.values(borrador.pedido).reduce((total, categoria) => {
+              return total + Object.values(categoria).filter(item => item.cantidad > 0).length;
+          }, 0);
+
+          const clienteInfo = borrador.cliente ? `<small class="d-block text-muted">Cliente: ${borrador.cliente.nombre}</small>` : '';
+
+          const item = document.createElement('div');
+          item.className = 'list-group-item d-flex justify-content-between align-items-center';
+          item.innerHTML = `
+              <div>
+                  <h6 class="mb-1">Borrador del ${borrador.fecha}</h6>
+                  <small>${itemCount} tipo(s) de producto(s) en el pedido.</small>
+                  ${clienteInfo}
+              </div>
+              <div>
+                  <button class="btn btn-sm btn-success me-2" onclick="cargarBorrador(${borrador.id})">Cargar</button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarBorrador(${borrador.id}, this)">Eliminar</button>
+              </div>
+          `;
+          listaContainer.appendChild(item);
+      });
+
+      gestionPedidoModal.show();
+  }
+
+  function crearNuevoPedido() {
+      localStorage.removeItem("pedidoSeleccion");
+      localStorage.removeItem("clienteSeleccionado");
+      gestionPedidoModal.hide();
+      // Ya no es necesario recargar, simplemente limpiamos los contadores de la vista.
+      pedido = { platos: {}, bebidas: {}, entradas: {} };
+      actualizarContadoresDesdePedido();
+      actualizarBotonResumen();
+  }
+
+  function cargarBorrador(idBorrador) {
+      let borradores = JSON.parse(localStorage.getItem("pedidosBorradores") || "[]");
+      const borradorACargar = borradores.find(b => b.id === idBorrador);
+
+      if (borradorACargar) {
+          localStorage.setItem("pedidoSeleccion", JSON.stringify(borradorACargar.pedido));
+          if (borradorACargar.cliente) {
+              localStorage.setItem("clienteSeleccionado", JSON.stringify(borradorACargar.cliente));
+          } else {
+              localStorage.removeItem("clienteSeleccionado");
+          }
+
+          const borradoresRestantes = borradores.filter(b => b.id !== idBorrador);
+          localStorage.setItem("pedidosBorradores", JSON.stringify(borradoresRestantes));
+
+          // En lugar de recargar, actualizamos la vista directamente
+          gestionPedidoModal.hide();
+          cargarPedidoGuardado();
+          actualizarContadoresDesdePedido();
+          actualizarBotonResumen();
+
+          // Ocultamos el botón de borradores si ya no quedan más
+          if (borradoresRestantes.length === 0) {
+              document.getElementById('btn-ver-borradores').classList.add('hidden');
+          }
+      }
+  }
+
+  function eliminarBorrador(idBorrador, buttonElement) {
+      if (!confirm("¿Estás seguro de que quieres eliminar este borrador?")) return;
+
+      let borradores = JSON.parse(localStorage.getItem("pedidosBorradores") || "[]");
+      const borradoresRestantes = borradores.filter(b => b.id !== idBorrador);
+      localStorage.setItem("pedidosBorradores", JSON.stringify(borradoresRestantes));
+
+      buttonElement.closest('.list-group-item').remove();
+      if (borradoresRestantes.length === 0) {
+          gestionPedidoModal.hide();
+          document.getElementById('btn-ver-borradores').classList.add('hidden');
+      }
+  }
+
+  // ==================== RESTO DE FUNCIONES (sin cambios) ======================
+  function cargarPedidoGuardado() {
+      const guardado = localStorage.getItem("pedidoSeleccion");
+      if (guardado) {
+          try {
+              pedido = JSON.parse(guardado) || { platos: {}, bebidas: {}, entradas: {} };
+          } catch (e) {
+              console.error("Error al cargar pedido guardado:", e);
+              localStorage.removeItem("pedidoSeleccion");
+              pedido = { platos: {}, bebidas: {}, entradas: {} };
+          }
+      } else {
+          pedido = { platos: {}, bebidas: {}, entradas: {} };
+      }
+  }
+
+  function actualizarContadoresDesdePedido() {
+      // Primero, reseteamos todos los contadores a 0
+      document.querySelectorAll('.contador').forEach(span => span.textContent = '0');
+      // Luego, actualizamos con los valores del pedido
+      if (!pedido) return;
+      for (const categoria in pedido) {
+          for (const id in pedido[categoria]) {
+              const elemento = document.getElementById(`contador-${categoria}-${id}`);
+              if (elemento) {
+                  elemento.textContent = pedido[categoria][id].cantidad;
+              }
+          }
+      }
+  }
+
+  function modificarCantidad(categoria, tipo, nombre, cambio, id, precio) {
+      if (!pedido[categoria]) pedido[categoria] = {};
+      if (!pedido[categoria][id]) {
+          pedido[categoria][id] = { id: id, nombre: nombre, cantidad: 0, precio: precio, tipo: tipo };
+      }
+
+      const itemEnPedido = pedido[categoria][id];
+      const nuevaCantidad = Math.max(0, itemEnPedido.cantidad + cambio);
+      itemEnPedido.cantidad = nuevaCantidad;
+
+      const elementoContador = document.getElementById(`contador-${categoria}-${id}`);
+      if (elementoContador) elementoContador.textContent = nuevaCantidad;
+
+      guardarPedido();
+      actualizarBotonResumen();
+  }
+
+  function guardarPedido() {
+      localStorage.setItem("pedidoSeleccion", JSON.stringify(pedido));
+  }
+
+  function actualizarBotonResumen() {
+      const btnResumen = document.getElementById("btn-ver-resumen");
+      const tieneItems = Object.values(pedido).some(categoria =>
+          Object.values(categoria).some(item => item && item.cantidad > 0)
+      );
+      btnResumen.classList.toggle("hidden", !tieneItems);
+  }
+
+  function mostrarCategoria(categoria) {
+      document.getElementById("seccion-platos").classList.toggle("hidden", categoria !== "platos");
+      document.getElementById("seccion-bebidas").classList.toggle("hidden", categoria !== "bebidas");
+      document.getElementById("seccion-entradas").classList.toggle("hidden", categoria !== "entradas");
+      document.getElementById("btn-platos").classList.toggle("active", categoria === "platos");
+      document.getElementById("btn-bebidas").classList.toggle("active", categoria === "bebidas");
+      document.getElementById("btn-entradas").classList.toggle("active", categoria === "entradas");
+  }
+
+  function verResumen() {
+      guardarPedido();
+      window.location.href = "resumen.html";
+  }
+</script>
+</body>
+</html>
