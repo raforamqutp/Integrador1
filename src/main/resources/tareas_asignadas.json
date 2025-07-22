@@ -1,0 +1,15 @@
+[ {
+  "id" : 1753164211835,
+  "worker" : {
+    "name" : "admin",
+    "role" : "ADMIN"
+  },
+  "title" : "SI",
+  "description" : "SI",
+  "type" : "preparacion_cocina",
+  "dueTime" : "2025-08-07T01:03",
+  "priority" : "Alta",
+  "status" : "Pendiente"
+}
+
+]
