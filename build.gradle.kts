@@ -29,6 +29,9 @@ dependencies {
 	implementation("commons-io:commons-io:2.15.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.apache.logging.log4j:log4j-api:2.20.0")
+	implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+	implementation ("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 
